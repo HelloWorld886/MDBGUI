@@ -1,0 +1,9 @@
+CMakeList.txt
+/compile_commands.json
+/.idea
+/.vscode
+/.xmake
+/build
+/cmake-build-debug-visual-studio-x64
+/cmake-build-debug-x64
+/CMakeLists.txt
