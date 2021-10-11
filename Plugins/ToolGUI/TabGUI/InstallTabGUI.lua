@@ -98,7 +98,7 @@ function InstallTabGUIClass:Install()
         return
     end
 
-    if not ADBService:Push(deviceName, mainObbPath, DataService:GetObbPath()) then
+    if not ADBService:Push(deviceName, mainObbPath, DataService:GetObbPath() .. Path.GetFileName(mainObbPath)) then
         LogE("主资源安装失败")
         return
     end
@@ -110,7 +110,7 @@ function InstallTabGUIClass:Install()
         return
     end
 
-    if not ADBService:Push(deviceName, patchObbPath, DataService:GetObbPath()) then
+    if not ADBService:Push(deviceName, patchObbPath, DataService:GetObbPath() .. Path.GetFileName(patchObbPath)) then
         LogE("副资源安装失败")
         return
     end

@@ -7,11 +7,9 @@
 
 QString PathKit::GetFileName(const QString& path)
 {
-	QFileInfo file(path);
-	if(!file.exists())
-		return "";
-
-	QString fileName = file.fileName();
-	return fileName;
+	QString tmp = QString(path);
+	tmp.replace('\\', "/");
+	int lastIndex = tmp.lastIndexOf('/');
+	return tmp.mid(lastIndex + 1, tmp.length());
 }
 

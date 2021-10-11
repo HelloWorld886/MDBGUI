@@ -51,7 +51,7 @@ function DataServiceClass:GetPackageName()
 end
 
 function DataServiceClass:GetObbPath()
-    return string.format("/sdcard/Android/obb/%s", self:GetPackageName())
+    return string.format("/sdcard/Android/obb/%s/", self:GetPackageName())
 end
 
 function DataServiceClass:GetGameLogPath()
