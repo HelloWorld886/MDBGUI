@@ -59,7 +59,7 @@ function ReplaceFileTabGUIClass:Replace()
     end
 
     self:SetSerialField("PkgBasePath", pkgbasePath)
-    if not ADBService:Push(deviceName, filePath, DataService:GetPkgBasePath() .. string.gsub(pkgbasePath, "\\", "/")) then
+    if not ADBService:Push(deviceName, filePath, DataService:GetPkgBasePath() .. string.gsub(pkgbasePath, "\\", "/") .. "/" .. Path.GetFileName(filePath)) then
         LogE("替换失败")
         return
     end

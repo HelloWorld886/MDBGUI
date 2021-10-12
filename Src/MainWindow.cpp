@@ -25,7 +25,7 @@ void MainWindow::SetupUI()
 
 	m_titleBar = new TitleBar(this);
 	m_titleBar->SetTitle(WINDOW_TITLE);
-	m_titleBar->SetIcon(QPixmap(":/Image/android.svg"));
+	m_titleBar->SetIcon(QPixmap(":/Image/android.png"));
 
 	m_mainWidget = new MainWidget(this);
 
