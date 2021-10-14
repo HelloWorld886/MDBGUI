@@ -4,6 +4,8 @@
 --- DateTime: 2021/9/30 18:08
 ---
 
+null = {}
+
 ClassLib = {}
 
 local __instanceid = 1

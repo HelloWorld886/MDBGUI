@@ -13,7 +13,8 @@ function ToolGUIClass:ctor()
         ClassLib.InstallTabGUIClass.new(),
         ClassLib.GameLogTabGUIClass.new(),
         ClassLib.LogcatTabGUIClass.new(),
-        ClassLib.ReplaceFileTabGUIClass.new()
+        ClassLib.ReplaceFileTabGUIClass.new(),
+        ClassLib.ReportCrashTabGUIClass.new()
     }
 end
 
@@ -41,7 +42,7 @@ end
 
 function ToolGUIClass:OnComboBoxChanged(objectName, index)
     for i = 1, #self._tabList do
-        if self._tabList[i]:OnComboBoxChanged(objectName, index) then
+        if self._tabList[i]:vOnComboBoxChanged(objectName, index) then
             break
         end
     end
@@ -49,7 +50,15 @@ end
 
 function ToolGUIClass:OnTextFieldChanged(objectName, text)
     for i = 1, #self._tabList do
-        if self._tabList[i]:OnTextFieldChanged(objectName, text) then
+        if self._tabList[i]:vOnTextFieldChanged(objectName, text) then
+            break
+        end
+    end
+end
+
+function ToolGUIClass:OnRadioGroupToggled(objectName, id, checked)
+    for i = 1, #self._tabList do
+        if self._tabList[i]:vOnRadioGroupToggled(objectName, id, checked) then
             break
         end
     end

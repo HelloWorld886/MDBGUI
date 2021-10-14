@@ -35,6 +35,8 @@ public slots:
 
 	void OnComboBoxChanged(const char* objectName, int index);
 
+	void OnRadioGroupToggled(const char* objectName, int id, bool checked);
+
 	void OnDestroyed(QObject* obj);
 private:
 	void SetupUI();

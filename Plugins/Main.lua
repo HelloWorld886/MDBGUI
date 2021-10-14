@@ -9,6 +9,8 @@ require("Plugins.Base.Serializable")
 require("Plugins.Base.GUI")
 require("Plugins.Service.SerializeService")
 require("Plugins.Service.ADBService")
+require("Plugins.Service.IDBService")
+require("Plugins.Service.MDBService")
 require("Plugins.Service.CoroutineService")
 require("Plugins.Service.DataService")
 require("Plugins.HeaderGUI.HeaderGUI")
@@ -18,15 +20,17 @@ require("Plugins.ToolGUI.TabGUI.InstallTabGUI")
 require("Plugins.ToolGUI.TabGUI.GameLogTabGUI")
 require("Plugins.ToolGUI.TabGUI.LogcatTabGUI")
 require("Plugins.ToolGUI.TabGUI.ReplaceFileTabGUI")
+require("Plugins.ToolGUI.TabGUI.ReportCrashTabGUI")
 
----@type HeaderGUIClass
 local headerGUI = false
----@type ToolGUIClass
 local toolGUI = false
 
 function Main(guiKit, procKit)
+    -- LogW("\niOS获取游戏日志功能需要以下条件才能正常执行：\n1、安装iTunes\n2、安装MDBGUI目录下ifuse/DokanSetup_redist.exe")
+     LogW("\niOS目前只支持安装、Logcat和获取崩溃日志\nAndroid不支持获取崩溃日志")
+
     SerializeService:Initialize()
-    ADBService:Initialize(procKit)
+    MDBService:Initialize(procKit)
 
     headerGUI = ClassLib.HeaderGUIClass.new()
     toolGUI = ClassLib.ToolGUIClass.new()
@@ -35,7 +39,7 @@ function Main(guiKit, procKit)
 end
 
 function OnDestroyed()
-    ADBService:KillProc()
+    MDBService:KillProcess()
     SerializeService:Save()
 end
 
@@ -61,6 +65,14 @@ function OnComboBoxChanged(objectName, index)
     end
 
     toolGUI:OnComboBoxChanged(objectName, index)
+end
+
+function OnRadioGroupToggled(objectName, id, checked)
+    if headerGUI:OnRadioGroupToggled(objectName, id, checked) then
+        return
+    end
+
+    toolGUI:OnComboBoxChanged(objectName, id, checked)
 end
 
 function OnTick(deltaTime)

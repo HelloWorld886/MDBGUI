@@ -55,7 +55,7 @@ function GameLogTabGUIClass:GrabGameLog()
         return
     end
 
-    if not ADBService:Pull(deviceName, DataService:GetGameLogPath(), logDir) then
+    if not MDBService:Pull(deviceName, DataService:GetGameLogPath(), logDir, DataService:GetPackageName()) then
         LogE("获取失败")
         return
     end

@@ -18,50 +18,6 @@
 #include "PathKit.h"
 #include <QScrollArea>
 
-int LogD(lua_State* luaState)
-{
-	const char* message = lua_tostring(luaState, 1);
-
-	std::string error;
-	lua_call_global_function(luaState, &error, "print", std::tie(), message);
-
-	Log::GetInstance()->PushDebug(message);
-	return 0;
-}
-
-int LogW(lua_State* luaState)
-{
-	const char* message = lua_tostring(luaState, 1);
-
-	std::string error;
-	lua_call_global_function(luaState, &error, "print", std::tie(), message);
-
-	Log::GetInstance()->PushWarning(message);
-
-	return 0;
-}
-
-int LogE(lua_State* luaState)
-{
-	const char* message = lua_tostring(luaState, 1);
-
-	std::string error;
-	lua_call_global_function(luaState, &error, "print", std::tie(), message);
-
-	Log::GetInstance()->PushError(message);
-
-	return 0;
-}
-
-int GetFileName(lua_State* luaState)
-{
-	const char* path = lua_tostring(luaState, 1);
-
-	std::string fileName = PathKit::GetFileName(path).toLatin1().data();
-	lua_pushstring(luaState, fileName.c_str());
-
-	return 1;
-}
 
 MainWidget::MainWidget(QWidget* parent) :
 		QWidget(parent),
@@ -85,13 +41,25 @@ MainWidget::MainWidget(QWidget* parent) :
 
 	lua_newtable(m_luaState);
 	lua_pushstring(m_luaState, "GetFileName");
-	lua_pushcfunction(m_luaState, GetFileName);
+	lua_pushcfunction(m_luaState, PathKit::GetFileNameLuaWrapper);
+	lua_settable(m_luaState, 1);
+	lua_pushstring(m_luaState, "TryRemoveDir");
+	lua_pushcfunction(m_luaState, PathKit::TryRemoveDirLuaWrapper);
+	lua_settable(m_luaState, 1);
+	lua_pushstring(m_luaState, "TryMakeDir");
+	lua_pushcfunction(m_luaState, PathKit::TryMakeDirLuaWrapper);
+	lua_settable(m_luaState, 1);
+	lua_pushstring(m_luaState, "TryCopy");
+	lua_pushcfunction(m_luaState, PathKit::TryCopyLuaWrapper);
+	lua_settable(m_luaState, 1);
+	lua_pushstring(m_luaState, "GetCurrentPath");
+	lua_pushcfunction(m_luaState, PathKit::GetCurrentPathLuaWrapper);
 	lua_settable(m_luaState, 1);
 	lua_setglobal(m_luaState, "Path");
 
-	lua_register(m_luaState, "LogD", LogD);
-	lua_register(m_luaState, "LogW", LogW);
-	lua_register(m_luaState, "LogE", LogE);
+	lua_register(m_luaState, "LogD", Log::LogDLuaWrapper);
+	lua_register(m_luaState, "LogW", Log::LogWLuaWrapper);
+	lua_register(m_luaState, "LogE", Log::LogELuaWrapper);
 
 	int ret = luaL_dofile(m_luaState, "Plugins/Main.lua");
 	if (ret)
@@ -174,6 +142,7 @@ QLayout* MainWidget::SetupFunctionUI(QWidget* parent)
 	connect(m_guiKit, &GUIKit::ButtonClicked, this, &MainWidget::OnButtonClicked);
 	connect(m_guiKit, &GUIKit::TextFieldChanged, this, &MainWidget::OnTextFieldChanged);
 	connect(m_guiKit, &GUIKit::ComboBoxChanged, this, &MainWidget::OnComboBoxChanged);
+	connect(m_guiKit, &GUIKit::RadioGroupToggled, this, &MainWidget::OnRadioGroupToggled);
 
 	return functionLayout;
 }
@@ -236,6 +205,17 @@ void MainWidget::OnDestroyed(QObject* obj)
 
 	std::string error;
 	lua_call_global_function(m_luaState, &error, "OnDestroyed", std::tie(), 1);
+	if(!error.empty())
+		Log::LogE(error.c_str());
+}
+
+void MainWidget::OnRadioGroupToggled(const char* objectName, int id, bool checked)
+{
+	if (!m_luaState)
+		return;
+
+	std::string error;
+	lua_call_global_function(m_luaState, &error, "OnRadioGroupToggled", std::tie(), objectName, id, checked);
 	if(!error.empty())
 		Log::LogE(error.c_str());
 }

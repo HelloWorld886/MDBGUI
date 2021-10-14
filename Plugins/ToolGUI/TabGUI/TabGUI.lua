@@ -44,6 +44,9 @@ function TabGUIClass:vOnComboBoxChanged(objectName, index)
 
 end
 
+function TabGUIClass:vOnRadioGroupToggled(objectName, id, checked)
+end
+
 function TabGUIClass:vOnTick(deltaTime)
 
 end

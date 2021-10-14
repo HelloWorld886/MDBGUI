@@ -8,7 +8,7 @@
  *	MainWindow
  */
 
-#define WINDOW_TITLE "Androider"
+#define WINDOW_TITLE "Mobile Debug Bridge"
 
 #define WIN_DEFAULT_WIDTH 640
 #define WIN_DEFAULT_HEIGHT 480

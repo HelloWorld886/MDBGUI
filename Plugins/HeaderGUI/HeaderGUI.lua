@@ -20,12 +20,15 @@ function HeaderGUIClass:Initialize(guiKit)
     self:ComboBox(DataService:GetRegionTable(), "region_cbb", DataService.RegionIndex - 1)
     self:EndLayout()
 
+    MDBService:SetPlatform(Platform.Android)
+    self:RadioGroup(PlatformName, "平台", "platform_rg", 0, 1, 0)
+
     self:BeginLayout(LayoutType.HBox, 1, "设备:")
     self:ComboBox({}, "device_cbb", 0, 4)
     self:Button("刷新", "device_refresh_btn", 1)
     self:EndLayout()
 
-    self:BeginLayout(LayoutType.HBox, 1, "远程连接:")
+    self:BeginLayout(LayoutType.HBox, 1, "远程设备或者模拟器连接(夜神127.0.0.1:62001):")
     self:LineField(self:GetSerialField("RemoteAddress"), "device_remote_lf", false, 1, "地址:端口")
     self:Button("连接", "device_remote_connect_btn")
     self:Button("断开连接", "device_remote_disconnect_btn")
@@ -44,14 +47,14 @@ end
 function HeaderGUIClass:RefreshDevices()
     DataService.DeviceData = false
 
-    local deviceList = ADBService:GetDevices()
+    local deviceList = MDBService:GetDevices()
     DataService.DeviceDataList = deviceList
     local deviceChars = { }
     if #deviceList == 1 then
-        deviceChars[1] =  string.format("%s(%s)", deviceList[1].Name, deviceList[1].Status)
+        deviceChars[1] =  string.format("%s(%s)", deviceList[1].Alias, deviceList[1].Status)
     elseif #deviceList ~= 0 then
         for i = 1, #deviceList do
-            deviceChars[i] = string.format("%s(%s)", deviceList[i].Name, deviceList[i].Status)
+            deviceChars[i] = string.format("%s(%s)", deviceList[i].Alias, deviceList[i].Status)
         end
     end
     self:SetComboBoxItems("device_cbb", deviceChars)
@@ -62,15 +65,15 @@ function HeaderGUIClass:OnButtonClicked(objectName)
         self:RefreshDevices()
         return true
     elseif objectName == "device_startserver_btn" then
-        ADBService:StartServer()
+        MDBService:StartServer()
         return true
     elseif objectName == "device_stopserver_btn" then
-        ADBService:KillServer()
+        MDBService:KillServer()
         return true
     elseif objectName == "device_remote_connect_btn" then
         local address = self:GetLineFieldText("device_remote_lf")
         self:SetSerialField("RemoteAddress", address)
-        if not ADBService:Connect(address) then
+        if not MDBService:Connect(address) then
             LogE(string.format("连接%s失败", address))
         else
             LogD(string.format("连接%s成功", address))
@@ -79,7 +82,7 @@ function HeaderGUIClass:OnButtonClicked(objectName)
         return true
     elseif objectName == "device_remote_disconnect_btn" then
         local address = self:GetLineFieldText("device_remote_lf")
-        if not ADBService:Disconnect(address) then
+        if not MDBService:Disconnect(address) then
             LogE(string.format("断连%s失败", address))
         else
             LogD(string.format("断连%s成功", address))
@@ -97,6 +100,23 @@ function HeaderGUIClass:OnComboBoxChanged(objectName, index)
         return true
     elseif objectName == "region_cbb" then
         DataService.RegionIndex = index + 1
+        return true
+    end
+end
+
+function HeaderGUIClass:OnRadioGroupToggled(objectName, id, checked)
+    if objectName == "platform_rg" then
+        if checked then
+            MDBService:SetPlatform(id + 1)
+            DataService:SetDeviceIndex(0)
+            self:SetComboBoxItems("device_cbb", null)
+            LogD("切换到" .. PlatformName[id + 1])
+            MDBService:StopProcess()
+            CoroutineService:StartCoroutine(function()
+                CoroutineService:WaitForTime(1)
+                self:RefreshDevices()
+            end)
+        end
         return true
     end
 end

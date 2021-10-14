@@ -15,6 +15,12 @@ function CoroutineServiceClass:StartCoroutine(func, ...)
         return
     end
 
+    local _, mainThread = coroutine.running()
+    if not mainThread then
+        LogE("CoroutineServiceClass.StartCoroutine : don't call StartCoroutine in coroutine")
+        return
+    end
+
     local thread = coroutine.create(func)
 
     local result, parameter = coroutine.resume(thread, ...)
@@ -27,6 +33,28 @@ function CoroutineServiceClass:StartCoroutine(func, ...)
     data.thread = thread
     data.func = func
     self._dataList[#self._dataList + 1] = data
+
+    return thread
+end
+
+function CoroutineServiceClass:StopCoroutine(thread)
+    if not thread then
+        return
+    end
+
+    local _, mainThread = coroutine.running()
+    if not mainThread then
+        LogE("CoroutineServiceClass.StopCoroutine : don't call StopCoroutine in coroutine")
+        return
+    end
+
+    for i = #self._dataList, 1, -1 do
+        local data = self._dataList[i]
+        if data ~= null and data.thread == thread then
+            self._dataList[i] = null
+            break
+        end
+    end
 end
 
 function CoroutineServiceClass:WaitForTime(sec)
@@ -36,18 +64,26 @@ end
 function CoroutineServiceClass:OnTick(deltaTime)
     for i = #self._dataList, 1, -1 do
         local data = self._dataList[i]
-        data.parameter = data.parameter - deltaTime
+        if data ~= null then
+            data.parameter = data.parameter - deltaTime
 
-        if data.parameter <= 0 then
-            local result, parameter = coroutine.resume(data.thread)
-            if not result or not parameter or parameter <= 0 then
-                table.remove(self._dataList, i)
-                break
+            if data.parameter <= 0 then
+                local result, parameter = coroutine.resume(data.thread)
+                if not result or not parameter or parameter <= 0 then
+                    self._dataList[i] = null
+                else
+                    data.parameter = parameter
+                end
             end
+        end
+    end
 
-            data.parameter = parameter
+    for i = #self._dataList, 1, -1 do
+        if self._dataList[i] == null then
+            table.remove(self._dataList, i)
         end
     end
 end
+
 
 CoroutineService = CoroutineServiceClass.new()

@@ -4,7 +4,7 @@
 --- DateTime: 2021/9/30 16:56
 ---
 
-local ExitCode = {
+ExitCode = {
     Success = 0,
     Crashed = 1,
     Unknown = 3,
@@ -59,6 +59,7 @@ end
 
 function ADBServiceClass:Pull(deviceName, srcPath, dstPath)
     LogD("adb pull")
+
     if self._proc.Start("adb.exe", string.format("-s %s pull %s %s", deviceName, srcPath, dstPath)) ~= ExitCode.Success then
         LogE("复制设备文件失败：" .. self._proc.GetError())
         return false
@@ -79,15 +80,18 @@ end
 
 function ADBServiceClass:Logcat(deviceName, priority, format, outputFilePath)
     LogD("adb logcat")
-    if self._proc.Start("adb.exe", string.format("-s %s logcat -%s %s", deviceName, priority, format), false) ~= ExitCode.Success then
+
+    local result = self._proc.Start("adb.exe", string.format("-s %s logcat -%s %s", deviceName, priority, format), false)
+    if result == ExitCode.Success or result == ExitCode.Crashed then
         local output = self._proc.GetOutput()
         local file = io.open(outputFilePath, "w+")
         file:write(output)
         io.close(file)
-        return false
+        return true
     end
 
-    return true
+    LogE("实时日志失败: " .. self._proc.GetError())
+    return false
 end
 
 function ADBServiceClass:Connect(address)
@@ -110,7 +114,7 @@ function ADBServiceClass:Disconnect(address)
     return true
 end
 
-function ADBServiceClass:Stop()
+function ADBServiceClass:StopProcess()
     LogD("stop proc")
     self._proc.Stop()
 end
@@ -142,14 +146,12 @@ function ADBServiceClass:GetDevices()
     local result = {}
     for i = 1, #splits do
         local data = string.split(splits[i], "\t")
-        result[#result + 1] = {Name = data[1], Status = data[2]}
+        result[#result + 1] = {Alias = data[1], Name = data[1], Status = data[2]}
     end
 
     return result
 end
 
-function ADBServiceClass:KillProc()
+function ADBServiceClass:KillProcess()
     self._proc.Start("cmd", "/c taskkill /im adb.exe /f")
 end
-
-ADBService = ADBServiceClass.new()

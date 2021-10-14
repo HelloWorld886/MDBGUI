@@ -8,6 +8,7 @@
 #include <QQueue>
 #include <QObject>
 #include <iostream>
+#include <luna/luna.h>
 
 enum LogLevel
 {
@@ -59,6 +60,10 @@ public:
 	inline void SetIsShowTime(bool isShowTime) { m_isShowTime = isShowTime; };
 
 	inline bool GetIsShowTime() { return m_isShowTime; };
+
+	int static LogDLuaWrapper(lua_State* state);
+	int static LogWLuaWrapper(lua_State* state);
+	int static LogELuaWrapper(lua_State* state);
 signals:
 
 	void DebugChanged(const QString& debug);

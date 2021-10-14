@@ -11,6 +11,8 @@ class QTabWidget;
 
 class QLayout;
 
+class QRadioButton;
+
 class GUIKit final : public QObject
 {
 Q_OBJECT
@@ -87,6 +89,14 @@ public:
 	std::string OpenDirDialog(const char* title,
 			const char* dir);
 
+	void RadioGroup(const char* items,
+			const char* title,
+			const char* objectName,
+			int defaultIndex,
+			int stretch = 0,
+			int direction = 0,
+			const char* prefixTitle = nullptr);
+
 	void SetSizePolicy(const char* objectName,
 			int horizontal,
 			int vertical);
@@ -98,6 +108,8 @@ signals:
 			const QString& text);
 	void ComboBoxChanged(const char* objectName,
 			int index);
+	void RadioGroupToggled(const char* object,
+			int id, bool check);
 private:
 	QWidget* m_rootWidget;
 	QLayout* m_rootLayout;

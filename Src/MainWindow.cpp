@@ -25,14 +25,14 @@ void MainWindow::SetupUI()
 
 	m_titleBar = new TitleBar(this);
 	m_titleBar->SetTitle(WINDOW_TITLE);
-	m_titleBar->SetIcon(QPixmap(":/Image/android.png"));
+	m_titleBar->SetIcon(QPixmap(":/Image/mobile.png"));
 
 	m_mainWidget = new MainWidget(this);
 
 	QWidget* wrapperWidget = new QWidget(this);
 	setCentralWidget(wrapperWidget);
 
-	auto layout = new QVBoxLayout(this);
+	auto layout = new QVBoxLayout;
 	centralWidget()->setLayout(layout);
 
 	layout->addWidget(m_titleBar);

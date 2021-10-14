@@ -59,10 +59,10 @@ function LogcatTabGUIClass:Start()
         return
     end
 
-    if not ADBService:Logcat(deviceName, "v", "tag", logFilePath) then
+    if not MDBService:Logcat(deviceName, "v", "tag", logFilePath) then
     end
 end
 
 function LogcatTabGUIClass:Stop()
-    ADBService:Stop()
+    MDBService:StopProcess()
 end

@@ -100,3 +100,8 @@ end
 function GUIClass:OpenDirDialog(title, dir)
     return self._guiKit.OpenDirDialog(title, dir)
 end
+
+function GUIClass:RadioGroup(items, title, objectName, defaultIndex, stretch, direction, prefixTitle)
+    local itemChars = table.concat(items, ";")
+    return self._guiKit.RadioGroup(itemChars, title, objectName, defaultIndex, stretch, direction, prefixTitle)
+end

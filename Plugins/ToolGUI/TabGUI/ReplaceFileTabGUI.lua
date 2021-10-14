@@ -35,12 +35,12 @@ end
 
 function ReplaceFileTabGUIClass:vOnButtonClicked(objectName)
     if objectName == "replacefile_explore_btn" then
-        local filePath = self:OpenFileDialog("替换文件", self:GetSerialField("FilePath"), "*.*")
+        local filePath = self:OpenFileDialog("替换文件", self:GetSerialField("FilePath"), "All File (*.*)")
         self:SetLineFieldText("replacefile_lf",  filePath)
         self:SetSerialField("FilePath", filePath)
         return true
     elseif objectName == "replacefile_replace_btn" then
-        self:Replace()
+        self:Grab()
     end
 end
 
@@ -59,7 +59,7 @@ function ReplaceFileTabGUIClass:Replace()
     end
 
     self:SetSerialField("PkgBasePath", pkgbasePath)
-    if not ADBService:Push(deviceName, filePath, DataService:GetPkgBasePath() .. string.gsub(pkgbasePath, "\\", "/") .. "/" .. Path.GetFileName(filePath)) then
+    if not MDBService:Push(deviceName, filePath, DataService:GetPkgBasePath() .. string.gsub(pkgbasePath, "\\", "/") .. "/" .. Path.GetFileName(filePath)) then
         LogE("替换失败")
         return
     end

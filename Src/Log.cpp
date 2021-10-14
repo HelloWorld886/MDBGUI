@@ -148,18 +148,18 @@ void Log::Push(LogLevel level, const QString& message)
 QString Log::Format(LogLevel level, const QString& message, bool isShowTime) const
 {
 	QString prefix;
-	switch (level)
-	{
-	case LogLevel::Debug:
-		prefix.append("[Debug]");
-		break;
-	case LogLevel::Warning:
-		prefix.append("[Warning]");
-		break;
-	case LogLevel::Error:
-		prefix.append("[Error]");
-		break;
-	}
+//	switch (level)
+//	{
+//	case LogLevel::Debug:
+//		prefix.append("[Debug]");
+//		break;
+//	case LogLevel::Warning:
+//		prefix.append("[Warning]");
+//		break;
+//	case LogLevel::Error:
+//		prefix.append("[Error]");
+//		break;
+//	}
 
 	if (isShowTime)
 	{
@@ -168,4 +168,39 @@ QString Log::Format(LogLevel level, const QString& message, bool isShowTime) con
 	}
 
 	return QString("%1:%2").arg(prefix, message);
+}
+
+int Log::LogDLuaWrapper(lua_State* luaState)
+{
+	const char* message = lua_tostring(luaState, 1);
+
+	std::string error;
+	lua_call_global_function(luaState, &error, "print", std::tie(), message);
+
+	Log::GetInstance()->PushDebug(message);
+	return 0;
+}
+
+int Log::LogWLuaWrapper(lua_State* luaState)
+{
+	const char* message = lua_tostring(luaState, 1);
+
+	std::string error;
+	lua_call_global_function(luaState, &error, "print", std::tie(), message);
+
+	Log::GetInstance()->PushWarning(message);
+
+	return 0;
+}
+
+int Log::LogELuaWrapper(lua_State* luaState)
+{
+	const char* message = lua_tostring(luaState, 1);
+
+	std::string error;
+	lua_call_global_function(luaState, &error, "print", std::tie(), message);
+
+	Log::GetInstance()->PushError(message);
+
+	return 0;
 }

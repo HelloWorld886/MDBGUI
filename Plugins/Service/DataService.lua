@@ -55,7 +55,11 @@ function DataServiceClass:GetObbPath()
 end
 
 function DataServiceClass:GetGameLogPath()
-    return string.format("/sdcard/Android/data/%s/files/Log", self:GetPackageName())
+    if MDBService:GetPlatform() == Platform.Android then
+        return string.format("/sdcard/Android/data/%s/files/Log", self:GetPackageName())
+    else
+        return "Log/"
+    end
 end
 
 function DataServiceClass:GetPkgBasePath()

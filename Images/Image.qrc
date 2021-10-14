@@ -3,6 +3,6 @@
         <file>exit.png</file>
         <file>min.png</file>
         <file>restore.png</file>
-        <file>android.png</file>
+        <file>mobile.png</file>
     </qresource>
 </RCC>

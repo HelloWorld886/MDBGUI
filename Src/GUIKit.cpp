@@ -12,6 +12,9 @@
 #include <QComboBox>
 #include <QFileDialog>
 #include <QScrollArea>
+#include <QRadioButton>
+#include <QButtonGroup>
+#include <QGroupBox>
 
 LUA_EXPORT_CLASS_BEGIN(GUIKit)
 LUA_EXPORT_METHOD(BeginTabWidget)
@@ -31,6 +34,7 @@ LUA_EXPORT_METHOD(SetComboBoxItems)
 LUA_EXPORT_METHOD(OpenFileDialog)
 LUA_EXPORT_METHOD(SetSizePolicy)
 LUA_EXPORT_METHOD(OpenDirDialog)
+LUA_EXPORT_METHOD(RadioGroup)
 LUA_EXPORT_CLASS_END()
 
 GUIKit::GUIKit(QWidget* rootWidget, LayoutType layoutType) :
@@ -366,6 +370,50 @@ std::string GUIKit::OpenDirDialog(const char* title,
 	std::string result = fileName.toLatin1().data();
 
 	return result;
+}
+
+void GUIKit::RadioGroup(const char* items,
+		const char* title,
+		const char* objectName,
+		int defaultIndex,
+		int stretch,
+		int direction,
+		const char* prefixTitle)
+{
+	QGroupBox* box = new QGroupBox(GetTopWidget());
+	box->setTitle(title);
+
+	QButtonGroup* buttonGroup = new QButtonGroup(box);
+	buttonGroup->setObjectName(objectName);
+
+	QLayout* internalLayout;
+	if(direction == 0)
+		internalLayout = new QHBoxLayout;
+	else
+		internalLayout = new QVBoxLayout;
+
+	QString itemChars(items);
+	QStringList list = itemChars.split(';');
+	for (int i = 0; i < list.length(); ++i)
+	{
+		if(list[i].isEmpty())
+			continue;
+
+		QRadioButton* radioButton = new QRadioButton(box);
+		radioButton->setText(list[i]);
+		buttonGroup->addButton(radioButton, i);
+		if (i == defaultIndex)
+			radioButton->setChecked(true);
+		internalLayout->addWidget(radioButton);
+	}
+
+	box->setLayout(internalLayout);
+
+	connect(buttonGroup, &QButtonGroup::idToggled, this, [this, objectName](int id, bool check){
+		emit RadioGroupToggled(objectName, id, check);
+	});
+
+	AddComponent(box, stretch, prefixTitle);
 }
 
 

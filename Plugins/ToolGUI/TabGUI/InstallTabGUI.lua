@@ -45,17 +45,17 @@ end
 
 function InstallTabGUIClass:vOnButtonClicked(objectName)
     if objectName == "install_apk_btn" then
-        local apkPath = self:OpenFileDialog("安装包", self:GetSerialField("ApkPath"), "*.apk")
+        local apkPath = self:OpenFileDialog("安装包", self:GetSerialField("ApkPath"), "Install File (*.apk *.ipa)")
         self:SetLineFieldText("install_apk_lf", apkPath)
         self:SetSerialField("ApkPath", apkPath)
         return true
     elseif objectName == "install_main_obb_btn" then
-        local mainObbPath = self:OpenFileDialog("主资源包", self:GetSerialField("MainObbPath"), "*.obb")
+        local mainObbPath = self:OpenFileDialog("主资源包", self:GetSerialField("MainObbPath"), "Obb File (*.obb)")
         self:SetLineFieldText("install_main_obb_lf", mainObbPath)
         self:SetSerialField("MainObbPath", mainObbPath)
         return true
     elseif objectName == "install_patch_obb_btn" then
-        local patchObbPath = self:OpenFileDialog("副资源包", self:GetSerialField("PatchObbPath"), "*.obb")
+        local patchObbPath = self:OpenFileDialog("副资源包", self:GetSerialField("PatchObbPath"), "Obb File (*.obb)")
         self:SetLineFieldText("install_patch_obb_lf", patchObbPath)
         self:SetSerialField("PatchObbPath", patchObbPath)
         return true
@@ -86,7 +86,7 @@ function InstallTabGUIClass:Install()
         return false
     end
 
-    if not ADBService:Install(deviceName, apkPath) then
+    if not MDBService:Install(deviceName, apkPath) then
         LogE(apkPath .. "安装失败")
         return
     end
@@ -98,7 +98,7 @@ function InstallTabGUIClass:Install()
         return
     end
 
-    if not ADBService:Push(deviceName, mainObbPath, DataService:GetObbPath() .. Path.GetFileName(mainObbPath)) then
+    if not MDBService:Push(deviceName, mainObbPath, DataService:GetObbPath() .. Path.GetFileName(mainObbPath)) then
         LogE("主资源安装失败")
         return
     end
@@ -110,7 +110,7 @@ function InstallTabGUIClass:Install()
         return
     end
 
-    if not ADBService:Push(deviceName, patchObbPath, DataService:GetObbPath() .. Path.GetFileName(patchObbPath)) then
+    if not MDBService:Push(deviceName, patchObbPath, DataService:GetObbPath() .. Path.GetFileName(patchObbPath)) then
         LogE("副资源安装失败")
         return
     end

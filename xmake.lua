@@ -5,7 +5,7 @@ add_repositories("musmus-repo https://gitee.com/musmus9405/xmake-repo.git")
 add_requires("lua v5.4.3", {configs = {shared = false}})
 add_requires("luna")
 
-target("Androider")
+target("MDBGUI")
     add_packages("lua")
     add_packages("luna")
     add_rules("qt.widgetapp")
@@ -15,19 +15,30 @@ target("Androider")
     add_files("Images/Icon.rc")
     add_files("Src/*.h")
     add_headerfiles("Src/*.h")
-    if is_plat("windows") and is_mode("debug") then
-        add_ldflags("/subsystem:console", "/entry:mainCRTStartup", {force = true})
-    end
-
-    after_build(function(target)
-        os.cp("$(projectdir)/Plugins/", "$(buildir)/$(plat)/$(arch)/$(mode)")
-    end)
-
     add_values("qt_runtimes",
         "QtCore",
         "QtGui",
         "QtWidgets"
     )
+    add_values("runtime_folders",
+        "$(projectdir)/Plugins/",
+        "$(projectdir)/libimobiledevice/",
+        "$(projectdir)/ifuse/"
+    )
+    add_values("runtime_files",
+        "$(buildir)/$(plat)/$(arch)/$(mode)/MDBGUI.exe",
+        "$(env ADB_HOME)/adb.exe"
+    )
+    if is_plat("windows") and is_mode("debug") then
+        add_ldflags("/subsystem:console", "/entry:mainCRTStartup", {force = true})
+    end
+
+    after_build(function(target)
+        local folders = target:values("runtime_folders")
+        for _, folder in ipairs(folders) do
+            os.cp(folder, "$(buildir)/$(plat)/$(arch)/$(mode)")
+        end
+    end)
 
     on_package(function(target)
         local copy_plugins = function( sourcedir, targetdir, ...)
@@ -47,22 +58,25 @@ target("Androider")
                 )
             end
         end
+
         import("core.base.semver")
 
         local buildir = "$(buildir)/$(plat)/$(arch)/$(mode)"
-        local packagedir = "$(buildir)/packages/Androider_" .. "$(plat)_$(arch)_$(mode)_x$(version)"
+        local packagedir = "$(buildir)/packages/MDBGUI_" .. "$(plat)_$(arch)_$(mode)_x$(version)"
         if os.isdir(packagedir) then
             os.rm(packagedir)
         end
         os.mkdir(packagedir)
 
-        os.cp(path.join(buildir, "Androider.exe"),
-            path.join(packagedir, "Androider.exe")
-        )
+        local files = target:values("runtime_files")
+        for _, file in ipairs(files) do
+            os.cp(file, packagedir)
+        end
 
-        os.cp(path.join(buildir, "Plugins/"),
-            path.join(packagedir)
-        )
+        local folders = target:values("runtime_folders")
+        for _, folder in ipairs(folders) do
+            os.cp(folder, packagedir)
+        end
 
         local qt = target:data("qt")
         assert(qt, "qt not found!")
@@ -85,11 +99,4 @@ target("Androider")
             path.join(packagedir, "platforms"),
             "qwindows"
         )
-
-        local adbHome = os.getenvs()["ADB_HOME"]
-        if adbHome then
-            os.cp(path.join(adbHome, "adb.exe"),
-                path.join(packagedir, "adb.exe")
-            )
-        end
     end)
