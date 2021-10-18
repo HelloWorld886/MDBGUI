@@ -27,7 +27,9 @@ target("MDBGUI")
     )
     add_values("runtime_files",
         "$(buildir)/$(plat)/$(arch)/$(mode)/MDBGUI.exe",
-        "$(env ADB_HOME)/adb.exe"
+        "$(env ADB_HOME)/adb.exe",
+        "$(env ADB_HOME)/AdbWinApi.dll",
+        "$(env ADB_HOME)/AdbWinUsbApi.dll"
     )
     if is_plat("windows") and is_mode("debug") then
         add_ldflags("/subsystem:console", "/entry:mainCRTStartup", {force = true})
