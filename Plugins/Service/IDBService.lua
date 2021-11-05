@@ -32,10 +32,13 @@ end
 
 function IDBServiceClass:Logcat(uuid, outputFilePath)
     self._taskName = "idevicesyslog.exe"
-    local cmd =  string.format("/c %s/libimobiledevice/idevicesyslog.exe -u %s -x >%s", Path.GetCurrentPath(), uuid, outputFilePath)
-    local result = self._proc.Start("cmd.exe", cmd, "抓取中...", "抓取完毕", self._defaultElapsed)
+    local cmd =  string.format("-u %s -x >", uuid)
+    local result = self._proc.Start("libimobiledevice/idevicesyslog.exe", cmd, "抓取中...", "抓取完毕", self._defaultElapsed)
     self._taskName = ""
     if result == ExitCode.Success or result == ExitCode.Crashed then
+        local file = io.open(outputFilePath, "w+")
+        file:write(self._proc.GetOutput())
+        io.close(file)
         return true
     end
 

@@ -5,7 +5,7 @@ function ReportCrashTabGUIClass:ctor()
 end
 
 function ReportCrashTabGUIClass:vGetTabName()
-    return "获取崩溃日志"
+    return "崩溃日志"
 end
 
 function ReportCrashTabGUIClass:vGetLayoutType()

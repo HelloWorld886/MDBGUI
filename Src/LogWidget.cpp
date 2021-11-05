@@ -8,6 +8,7 @@
 #include <QVBoxLayout>
 #include <QPushButton>
 #include <QSizePolicy>
+#include <QScrollBar>
 
 
 LogWidget::LogWidget(QWidget* parent) : QWidget(parent)
@@ -37,6 +38,8 @@ LogWidget::LogWidget(QWidget* parent) : QWidget(parent)
 		cursor.insertText(data + "\n");
 	}
 
+	m_edit->moveCursor(QTextCursor::End);
+
 	Log* logInstance = Log::GetInstance();
 	connect(logInstance, &Log::DebugChanged, this, &LogWidget::OnDebugChanged);
 	connect(logInstance, &Log::WarningChanged, this, &LogWidget::OnWarningChanged);
@@ -56,6 +59,8 @@ void LogWidget::OnDebugChanged(const QString& debug)
 	QTextCharFormat charFormat;
 	charFormat.setForeground(QBrush("#ffffff"));
 	cursor.insertText(debug.trimmed()+ "\n", charFormat);
+
+	m_edit->moveCursor(QTextCursor::End);
 }
 
 void LogWidget::OnWarningChanged(const QString& warning)
@@ -65,6 +70,8 @@ void LogWidget::OnWarningChanged(const QString& warning)
 	QTextCharFormat charFormat;
 	charFormat.setForeground(QBrush("#DAA520"));
 	cursor.insertText(warning.trimmed()+ "\n", charFormat);
+
+	m_edit->moveCursor(QTextCursor::End);
 }
 
 void LogWidget::OnErrorChanged(const QString& error)
@@ -74,6 +81,8 @@ void LogWidget::OnErrorChanged(const QString& error)
 	QTextCharFormat charFormat;
 	charFormat.setForeground(QBrush("#DC143C"));
 	cursor.insertText(error.trimmed() + "\n", charFormat);
+
+	m_edit->moveCursor(QTextCursor::End);
 }
 
 void LogWidget::OnClearButtonClicked(bool checked)

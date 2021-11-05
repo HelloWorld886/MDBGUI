@@ -11,7 +11,7 @@ function LogcatTabGUIClass:ctor()
 end
 
 function LogcatTabGUIClass:vGetTabName()
-    return "Logcat"
+    return "实时日志"
 end
 
 function LogcatTabGUIClass:vGetLayoutType()
