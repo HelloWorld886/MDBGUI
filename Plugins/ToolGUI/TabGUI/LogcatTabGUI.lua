@@ -48,19 +48,9 @@ end
 
 function LogcatTabGUIClass:Start()
     local deviceName = DataService:GetDeviceName()
-    if not deviceName or deviceName == "" then
-        LogE("尚未连接设备")
-        return
-    end
-
     local logFilePath = self:GetSerialField("LogFilePath")
-    if not logFilePath then
-        LogE("请先选择输出文件")
-        return
-    end
 
-    if not MDBService:Logcat(deviceName, "v", "tag", logFilePath) then
-    end
+   MDBService:Logcat(deviceName, "v", "tag", logFilePath)
 end
 
 function LogcatTabGUIClass:Stop()

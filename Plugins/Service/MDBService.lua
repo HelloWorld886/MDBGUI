@@ -135,11 +135,8 @@ function MDBServiceClass:ReportCrash(deviceName, dir)
 end
 
 function MDBServiceClass:KillProcess()
-    if self._platform == Platform.Android then
-        return self._adbService:KillProcess()
-    else
-        return self._idbService:KillProcess()
-    end
+    self._adbService:KillProcess()
+    self._idbService:KillProcess()
 end
 
 MDBService = MDBServiceClass.new()

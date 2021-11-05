@@ -15,6 +15,7 @@ ExitCode = {
 local ADBServiceClass = DeclareClass("ADBServiceClass")
 
 function ADBServiceClass:ctor()
+    self._defaultElapsed = 1000
     self._proc = false
 end
 
@@ -23,9 +24,7 @@ function ADBServiceClass:Initialize(processKit)
 end
 
 function ADBServiceClass:KillServer()
-    LogD("adb kill-server")
-
-    if self._proc.Start("adb.exe", "kill-server") ~= ExitCode.Success then
+    if self._proc.Start("adb.exe", "kill-server", "停止中...", "停止完毕", self._defaultElapsed) ~= ExitCode.Success then
         LogE("停止服务失败：" .. self._proc.GetError())
         return false
     end
@@ -35,9 +34,7 @@ function ADBServiceClass:KillServer()
 end
 
 function ADBServiceClass:StartServer()
-    LogD("adb start-server")
-
-    if self._proc.Start("adb.exe", "start-server") ~= ExitCode.Success then
+    if self._proc.Start("adb.exe", "start-server", "启动中...", "启动完毕", self._defaultElapsed) ~= ExitCode.Success then
         LogE("启动服务失败：".. self._proc.GetError())
         return false
     end
@@ -47,10 +44,8 @@ function ADBServiceClass:StartServer()
 end
 
 function ADBServiceClass:Push(deviceName, srcPath, dstPath)
-    LogD("adb push")
-    LogD(string.format("-s %s push %s %s", deviceName, srcPath, dstPath))
-    if self._proc.Start("adb.exe", string.format("-s %s push %s %s", deviceName, srcPath, dstPath)) ~= ExitCode.Success then
-        LogE("复制电脑文件失败：".. self._proc.GetError())
+    if self._proc.Start("adb.exe", string.format("-s %s push %s %s", deviceName, srcPath, dstPath),  "拷贝中...", "拷贝完毕", 2000) ~= ExitCode.Success then
+        LogE("拷贝电脑文件失败：".. self._proc.GetError())
         return false
     end
 
@@ -58,10 +53,8 @@ function ADBServiceClass:Push(deviceName, srcPath, dstPath)
 end
 
 function ADBServiceClass:Pull(deviceName, srcPath, dstPath)
-    LogD("adb pull")
-
-    if self._proc.Start("adb.exe", string.format("-s %s pull %s %s", deviceName, srcPath, dstPath)) ~= ExitCode.Success then
-        LogE("复制设备文件失败：" .. self._proc.GetError())
+    if self._proc.Start("adb.exe", string.format("-s %s pull %s %s", deviceName, srcPath, dstPath), "拷贝中...", "拷贝完毕", self._defaultElapsed) ~= ExitCode.Success then
+        LogE("拷贝设备文件失败：" .. self._proc.GetError())
         return false
     end
 
@@ -69,8 +62,7 @@ function ADBServiceClass:Pull(deviceName, srcPath, dstPath)
 end
 
 function ADBServiceClass:Install(deviceName, apkPath)
-    LogD("adb install")
-    if self._proc.Start("adb.exe", string.format("-s %s install %s", deviceName, apkPath)) ~= ExitCode.Success then
+    if self._proc.Start("adb.exe", string.format("-s %s install %s", deviceName, apkPath), "安装中...", "安装完毕", 3000) ~= ExitCode.Success then
         LogE("安装文件失败：".. self._proc.GetError())
         return false
     end
@@ -79,9 +71,7 @@ function ADBServiceClass:Install(deviceName, apkPath)
 end
 
 function ADBServiceClass:Logcat(deviceName, priority, format, outputFilePath)
-    LogD("adb logcat")
-
-    local result = self._proc.Start("adb.exe", string.format("-s %s logcat -%s %s", deviceName, priority, format), false)
+    local result = self._proc.Start("adb.exe", string.format("-s %s logcat -%s %s", deviceName, priority, format), "抓取中...", "抓取完毕", self._defaultElapsed,false)
     if result == ExitCode.Success or result == ExitCode.Crashed then
         local output = self._proc.GetOutput()
         local file = io.open(outputFilePath, "w+")
@@ -95,8 +85,7 @@ function ADBServiceClass:Logcat(deviceName, priority, format, outputFilePath)
 end
 
 function ADBServiceClass:Connect(address)
-    LogD("adb connect")
-    if self._proc.Start("adb.exe", string.format("connect %s", address)) ~= ExitCode.Success then
+    if self._proc.Start("adb.exe", string.format("connect %s", address), "连接中...", "连接完毕", self._defaultElapsed) ~= ExitCode.Success then
         LogE("连接远程设备失败：".. self._proc.GetError())
         return false
     end
@@ -106,7 +95,7 @@ end
 
 function ADBServiceClass:Disconnect(address)
     LogD("adb disconnect")
-    if self._proc.Start("adb.exe", string.format("disconnect %s", address)) ~= ExitCode.Success then
+    if self._proc.Start("adb.exe", string.format("disconnect %s", address), "断开连接中...", "断开完毕", self._defaultElapsed) ~= ExitCode.Success then
         LogE("断开远程设备失败：".. self._proc.GetError())
         return false
     end
@@ -115,14 +104,11 @@ function ADBServiceClass:Disconnect(address)
 end
 
 function ADBServiceClass:StopProcess()
-    LogD("stop proc")
     self._proc.Stop()
 end
 
 function ADBServiceClass:GetDevices()
-    LogD("adb devices")
-
-    if self._proc.Start("adb.exe", "devices") ~= ExitCode.Success then
+    if self._proc.Start("adb.exe", "devices", "获取设备中...", "获取设备完毕", self._defaultElapsed) ~= ExitCode.Success then
         LogE("获取设备失败：".. self._proc.GetError())
         return {}
     end
@@ -153,5 +139,6 @@ function ADBServiceClass:GetDevices()
 end
 
 function ADBServiceClass:KillProcess()
-    self._proc.Start("cmd", "/c taskkill /im adb.exe /f")
+    self._proc:Stop()
+    self._proc.Start("cmd", "/c taskkill /im adb.exe /f", "结束adb进程中...", "结束完毕", self._defaultElapsed)
 end

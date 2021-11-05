@@ -26,7 +26,12 @@ ProcessKit::~ProcessKit()
 	m_proc->deleteLater();
 }
 
-int ProcessKit::Start(const char* program, const char* command, bool showLog)
+int ProcessKit::Start(const char* program,
+		const char* command,
+		const char* progress,
+		const char* finish,
+		long elapsed,
+		bool showLog)
 {
 	if(m_proc->state() != QProcess::NotRunning)
 		return HasProcRunning;
@@ -44,7 +49,9 @@ int ProcessKit::Start(const char* program, const char* command, bool showLog)
 
 	while (m_proc->state() != QProcess::NotRunning)
 	{
-		WaitSleep(100);
+		Log::LogD(progress);
+
+		WaitSleep(elapsed);
 
 		auto outBa = m_proc->readAllStandardOutput();
 		auto errBa = m_proc->readAllStandardError();
@@ -67,6 +74,8 @@ int ProcessKit::Start(const char* program, const char* command, bool showLog)
 			}
 		}
 	}
+
+	Log::LogD(finish);
 
 	m_proc->close();
 	if(m_proc->exitStatus() != QProcess::NormalExit)

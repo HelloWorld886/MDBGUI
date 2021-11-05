@@ -7,6 +7,7 @@
 local IDBServiceClass = DeclareClass("IDBServiceClass")
 
 function IDBServiceClass:ctor()
+    self._defaultElapsed = 1000
     self._proc = false
     self._taskName = ""
 end
@@ -16,11 +17,10 @@ function IDBServiceClass:Initialize(processKit)
 end
 
 function IDBServiceClass:Install(uuid, ipaPath)
-    LogD("idb install")
     self._taskName = "ideviceinstaller.exe"
 
     local cmd = string.format("-u %s -i %s", uuid, ipaPath)
-    if self._proc.Start("libimobiledevice/ideviceinstaller.exe", cmd) ~= ExitCode.Success then
+    if self._proc.Start("libimobiledevice/ideviceinstaller.exe", cmd, "安装中...", "安装完毕", 3000) ~= ExitCode.Success then
         LogE("安装文件失败：".. self._proc.GetError())
         self._taskName = ""
         return false
@@ -31,11 +31,10 @@ function IDBServiceClass:Install(uuid, ipaPath)
 end
 
 function IDBServiceClass:Logcat(uuid, outputFilePath)
-    LogD("idb logcat")
-    self._taskName = ""
+    self._taskName = "idevicesyslog.exe"
     local cmd =  string.format("/c %s/libimobiledevice/idevicesyslog.exe -u %s -x >%s", Path.GetCurrentPath(), uuid, outputFilePath)
-    LogD(cmd)
-    local result = self._proc.Start("cmd.exe", cmd)
+    local result = self._proc.Start("cmd.exe", cmd, "抓取中...", "抓取完毕", self._defaultElapsed)
+    self._taskName = ""
     if result == ExitCode.Success or result == ExitCode.Crashed then
         return true
     end
@@ -45,7 +44,6 @@ function IDBServiceClass:Logcat(uuid, outputFilePath)
 end
 
 function IDBServiceClass:Pull(uuid, bundleName, srcPath, dstPath)
-    LogD("idb pull")
     self._taskName = "ifuse.exe"
 
     Path.TryRemoveDir("mnt")
@@ -58,8 +56,7 @@ function IDBServiceClass:Pull(uuid, bundleName, srcPath, dstPath)
 
     local exit = false
     local cmd = string.format("mnt -u %s --documents %s", uuid, bundleName)
-    LogD(cmd)
-    local result = self._proc.Start("ifuse/ifuse.exe", cmd)
+    local result = self._proc.Start("ifuse/ifuse.exe", cmd, "拷贝中...", "拷贝完毕", self._defaultElapsed)
     CoroutineService:StopCoroutine(coroutine)
     if result == ExitCode.Crashed or result == ExitCode.Success then
         Path.TryCopy("mnt/" .. srcPath, dstPath)
@@ -70,21 +67,19 @@ function IDBServiceClass:Pull(uuid, bundleName, srcPath, dstPath)
 
     Path.TryRemoveDir("mnt")
     if not exit then
-        LogE("获取文件失败: " .. self._proc.GetError())
+        LogE("拷贝文件失败: " .. self._proc.GetError())
     end
     return exit
 end
 
 function IDBServiceClass:StopProcess()
-    LogD("stop proc")
     self._proc.Stop()
 end
 
 function IDBServiceClass:GetDevices()
-    LogD("idb devices")
     self._taskName = "idevice_id.exe"
 
-    if self._proc.Start("libimobiledevice/idevice_id.exe") ~= ExitCode.Success then
+    if self._proc.Start("libimobiledevice/idevice_id.exe", "", "获取设备中...", "获取设备完毕", self._defaultElapsed) ~= ExitCode.Success then
         self._taskName = ""
         LogE("获取设备失败：".. self._proc.GetError())
         return {}
@@ -112,7 +107,7 @@ function IDBServiceClass:GetDevices()
         local alias = ""
         local name = data[1]
         local status = data[2]
-        if self._proc.Start("libimobiledevice/idevice_id.exe", name) == ExitCode.Success then
+        if self._proc.Start("libimobiledevice/idevice_id.exe", name, "获取设备名中", "获取设备名完毕", self._defaultElapsed) == ExitCode.Success then
             alias = string.trim(self._proc.GetOutput(), "\n")
         end
         result[#result + 1] = {Name = name, Status = status, Alias = alias}
@@ -122,9 +117,7 @@ function IDBServiceClass:GetDevices()
 end
 
 function IDBServiceClass:ReportCrash(uuid, dir)
-    LogD("idb crashreport")
-
-    local result = self._proc.Start("libimobiledevice/idevicecrashreport.exe", string.format("-u %s %s", uuid, dir));
+    local result = self._proc.Start("libimobiledevice/idevicecrashreport.exe", string.format("-u %s %s", uuid, dir), "获取日志中...", "获取日志完毕", 2000);
     if result ~= ExitCode.Success then
         LogE("获取崩溃日志失败：".. self._proc.GetError())
         return false
@@ -135,6 +128,7 @@ end
 
 function IDBServiceClass:KillProcess()
     if self._taskName and self._taskName ~= "" then
-        self._proc.Start("cmd", string.format("/c taskkill /im %s /f", self._taskName))
+        self._proc:Stop()
+        self._proc.Start("cmd", string.format("/c taskkill /im %s /f", self._taskName), "结束进程中...",  "结束完毕", self._defaultElapsed)
     end
 end

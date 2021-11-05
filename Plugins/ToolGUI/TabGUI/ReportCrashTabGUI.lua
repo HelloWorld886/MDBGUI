@@ -38,20 +38,6 @@ end
 
 function ReportCrashTabGUIClass:Grab()
     local deviceName = DataService:GetDeviceName()
-    if not deviceName or deviceName == "" then
-        LogE("尚未连接设备")
-        return
-    end
-
     local crashDir = self:GetSerialField("CrashDir")
-    if not crashDir then
-        LogE("无效的路径")
-        return
-    end
-
-    if not MDBService:ReportCrash(deviceName, crashDir) then
-        LogE("获取失败")
-        return
-    end
-    LogD("获取成功")
+    MDBService:ReportCrash(deviceName, crashDir)
 end

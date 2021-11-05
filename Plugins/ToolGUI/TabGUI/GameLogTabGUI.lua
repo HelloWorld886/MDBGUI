@@ -44,21 +44,6 @@ end
 
 function GameLogTabGUIClass:GrabGameLog()
     local deviceName = DataService:GetDeviceName()
-    if not deviceName or deviceName == "" then
-        LogE("尚未连接设备")
-        return
-    end
-
     local logDir = self:GetSerialField("LogDir")
-    if not logDir then
-        LogE("请先选择路径")
-        return
-    end
-
-    if not MDBService:Pull(deviceName, DataService:GetGameLogPath(), logDir, DataService:GetPackageName()) then
-        LogE("获取失败")
-        return
-    end
-
-    LogD("获取成功")
+    MDBService:Pull(deviceName, DataService:GetGameLogPath(), logDir, DataService:GetPackageName())
 end

@@ -40,28 +40,15 @@ function ReplaceFileTabGUIClass:vOnButtonClicked(objectName)
         self:SetSerialField("FilePath", filePath)
         return true
     elseif objectName == "replacefile_replace_btn" then
-        self:Grab()
+        self:Replace()
     end
 end
 
 function ReplaceFileTabGUIClass:Replace()
     local deviceName = DataService:GetDeviceName()
-    if not deviceName or deviceName == "" then
-        LogE("尚未连接设备")
-        return
-    end
-
     local pkgbasePath = self:GetLineFieldText("replacefile_pkgbase_lf")
     local filePath = self:GetSerialField("FilePath")
-    if not filePath or not pkgbasePath then
-        LogE("无效的路径")
-        return
-    end
 
     self:SetSerialField("PkgBasePath", pkgbasePath)
-    if not MDBService:Push(deviceName, filePath, DataService:GetPkgBasePath() .. string.gsub(pkgbasePath, "\\", "/") .. "/" .. Path.GetFileName(filePath)) then
-        LogE("替换失败")
-        return
-    end
-    LogD("替换成功")
+    MDBService:Push(deviceName, filePath, DataService:GetPkgBasePath() .. string.gsub(pkgbasePath, "\\", "/") .. "/" .. Path.GetFileName(filePath))
 end

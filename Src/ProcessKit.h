@@ -26,7 +26,12 @@ public:
 
 	~ProcessKit();
 
-	int Start(const char* program, const char* command, bool showLog = true);
+	int Start(const char* program,
+			const char* command,
+			const char* progress,
+			const char* finish,
+			long elapsed = 100,
+			bool showLog = true);
 
 	void Stop();
 

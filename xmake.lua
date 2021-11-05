@@ -1,4 +1,4 @@
-set_config("version", "0.0.1")
+set_config("version", "0.0.2")
 add_rules("mode.debug", "mode.release")
 
 add_repositories("musmus-repo https://gitee.com/musmus9405/xmake-repo.git")
@@ -64,7 +64,7 @@ target("MDBGUI")
         import("core.base.semver")
 
         local buildir = "$(buildir)/$(plat)/$(arch)/$(mode)"
-        local packagedir = "$(buildir)/packages/MDBGUI_" .. "$(plat)_$(arch)_$(mode)_x$(version)"
+        local packagedir = "$(buildir)/packages/MDBGUI_" .. "$(plat)_$(arch)_$(mode)_v$(version)"
         if os.isdir(packagedir) then
             os.rm(packagedir)
         end

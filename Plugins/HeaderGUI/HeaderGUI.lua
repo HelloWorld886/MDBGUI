@@ -73,19 +73,13 @@ function HeaderGUIClass:OnButtonClicked(objectName)
     elseif objectName == "device_remote_connect_btn" then
         local address = self:GetLineFieldText("device_remote_lf")
         self:SetSerialField("RemoteAddress", address)
-        if not MDBService:Connect(address) then
-            LogE(string.format("连接%s失败", address))
-        else
-            LogD(string.format("连接%s成功", address))
+        if MDBService:Connect(address) then
             self:RefreshDevices()
         end
         return true
     elseif objectName == "device_remote_disconnect_btn" then
         local address = self:GetLineFieldText("device_remote_lf")
-        if not MDBService:Disconnect(address) then
-            LogE(string.format("断连%s失败", address))
-        else
-            LogD(string.format("断连%s成功", address))
+        if  MDBService:Disconnect(address) then
             self:RefreshDevices()
         end
     end
@@ -111,7 +105,7 @@ function HeaderGUIClass:OnRadioGroupToggled(objectName, id, checked)
             DataService:SetDeviceIndex(0)
             self:SetComboBoxItems("device_cbb", null)
             LogD("切换到" .. PlatformName[id + 1])
-            MDBService:StopProcess()
+            MDBService:KillProcess()
             CoroutineService:StartCoroutine(function()
                 CoroutineService:WaitForTime(1)
                 self:RefreshDevices()

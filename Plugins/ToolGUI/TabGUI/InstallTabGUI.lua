@@ -75,45 +75,13 @@ end
 
 function InstallTabGUIClass:Install()
     local deviceName = DataService:GetDeviceName()
-    if not deviceName or deviceName == "" then
-        LogE("未连接设备")
-        return
-    end
 
     local apkPath = self:GetSerialField("ApkPath")
-    if not apkPath then
-        LogE("无效的安装路径")
-        return false
-    end
-
-    if not MDBService:Install(deviceName, apkPath) then
-        LogE(apkPath .. "安装失败")
-        return
-    end
+    MDBService:Install(deviceName, apkPath)
 
     local mainObbPath = self:GetSerialField("MainObbPath")
-    if not mainObbPath then
-        LogD("跳过主资源")
-        LogD("安装完成")
-        return
-    end
-
-    if not MDBService:Push(deviceName, mainObbPath, DataService:GetObbPath() .. Path.GetFileName(mainObbPath)) then
-        LogE("主资源安装失败")
-        return
-    end
+    MDBService:Push(deviceName, mainObbPath, DataService:GetObbPath() .. Path.GetFileName(mainObbPath))
 
     local patchObbPath = self:GetSerialField("PatchObbPath")
-    if not patchObbPath then
-        LogD("跳过副资源")
-        LogD("安装完成")
-        return
-    end
-
-    if not MDBService:Push(deviceName, patchObbPath, DataService:GetObbPath() .. Path.GetFileName(patchObbPath)) then
-        LogE("副资源安装失败")
-        return
-    end
-
-    LogD("安装完成")
+    MDBService:Push(deviceName, patchObbPath, DataService:GetObbPath() .. Path.GetFileName(patchObbPath))
 end

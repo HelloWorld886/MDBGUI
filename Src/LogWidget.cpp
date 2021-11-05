@@ -32,7 +32,9 @@ LogWidget::LogWidget(QWidget* parent) : QWidget(parent)
 	Log::GetInstance()->GetAllLog(m_list);
 	for (auto data: m_list)
 	{
-		m_edit->insertPlainText(data + "\n");
+		auto cursor = m_edit->textCursor();
+		cursor.movePosition(QTextCursor::End);
+		cursor.insertText(data + "\n");
 	}
 
 	Log* logInstance = Log::GetInstance();
@@ -49,20 +51,29 @@ LogWidget::~LogWidget() noexcept
 
 void LogWidget::OnDebugChanged(const QString& debug)
 {
-	m_edit->setTextColor(QColor("#ffffff"));
-	m_edit->insertPlainText(debug.trimmed() + "\n");
+	auto cursor = m_edit->textCursor();
+	cursor.movePosition(QTextCursor::End);
+	QTextCharFormat charFormat;
+	charFormat.setForeground(QBrush("#ffffff"));
+	cursor.insertText(debug.trimmed()+ "\n", charFormat);
 }
 
 void LogWidget::OnWarningChanged(const QString& warning)
 {
-	m_edit->setTextColor(QColor("#DAA520"));
-	m_edit->insertPlainText(warning.trimmed() + "\n");
+	auto cursor = m_edit->textCursor();
+	cursor.movePosition(QTextCursor::End);
+	QTextCharFormat charFormat;
+	charFormat.setForeground(QBrush("#DAA520"));
+	cursor.insertText(warning.trimmed()+ "\n", charFormat);
 }
 
 void LogWidget::OnErrorChanged(const QString& error)
 {
-	m_edit->setTextColor(QColor("#DC143C"));
-	m_edit->insertPlainText( error.trimmed() + "\n");
+	auto cursor = m_edit->textCursor();
+	cursor.movePosition(QTextCursor::End);
+	QTextCharFormat charFormat;
+	charFormat.setForeground(QBrush("#DC143C"));
+	cursor.insertText(error.trimmed() + "\n", charFormat);
 }
 
 void LogWidget::OnClearButtonClicked(bool checked)
