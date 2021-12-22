@@ -22,16 +22,18 @@ require("Plugins.ToolGUI.TabGUI.LogcatTabGUI")
 require("Plugins.ToolGUI.TabGUI.ReplaceFileTabGUI")
 require("Plugins.ToolGUI.TabGUI.ReportCrashTabGUI")
 
+LogD = Log.LogD
+LogW = Log.LogW
+LogE = Log.LogE
+
 local headerGUI = false
 local toolGUI = false
 
 function Main(guiKit, procKit)
     -- LogW("\niOS获取游戏日志功能需要以下条件才能正常执行：\n1、安装iTunes\n2、安装MDBGUI目录下ifuse/DokanSetup_redist.exe")
      LogW("\niOS目前只支持安装、实时日志和崩溃日志\nAndroid不支持崩溃日志")
-
     SerializeService:Initialize()
     MDBService:Initialize(procKit)
-
     headerGUI = ClassLib.HeaderGUIClass.new()
     toolGUI = ClassLib.ToolGUIClass.new()
     headerGUI:Initialize(guiKit)

@@ -32,76 +32,76 @@ function GUIClass:Initialize(guiKit)
 end
 
 function GUIClass:BeginTabWidget(objectName, prefixTitle)
-    self._guiKit.BeginTabWidget(objectName, prefixTitle or "")
+    self._guiKit:BeginTabWidget(objectName, prefixTitle or "")
 end
 
 function GUIClass:EndTabWidget()
-    self._guiKit.EndTabWidget()
+    self._guiKit:EndTabWidget()
 end
 
 function GUIClass:BeginTab(title, layoutType, objectName)
-    self._guiKit.BeginTab(title, layoutType, objectName)
+    self._guiKit:BeginTab(title, layoutType, objectName)
 end
 
 function GUIClass:EndTab()
-    self._guiKit.EndTab()
+    self._guiKit:EndTab()
 end
 
 function GUIClass:BeginLayout(layoutType, stretch, prefixTitle)
-    self._guiKit.BeginLayout(layoutType, stretch or 0, prefixTitle or "")
+    self._guiKit:BeginLayout(layoutType, stretch or 0, prefixTitle or "")
 end
 
 function GUIClass:EndLayout()
-    self._guiKit.EndLayout()
+    self._guiKit:EndLayout()
 end
 
 function GUIClass:Button(text, objectName, stretch, prefixTitle)
-    self._guiKit.Button(text, objectName, stretch or 0, prefixTitle or "")
+    self._guiKit:Button(text, objectName, stretch or 0, prefixTitle or "")
 end
 
 function GUIClass:Label(text, objectName, stretch, prefixTitle)
-    self._guiKit.Label(text, objectName, stretch or 0 , prefixTitle or "")
+    self._guiKit:Label(text, objectName, stretch or 0 , prefixTitle or "")
 end
 
 function GUIClass:TextField(text, objectName, isReadOnly, stretch, prefixTitle)
-    self._guiKit.TextField(text, objectName, isReadOnly, stretch or 0, prefixTitle or "")
+    self._guiKit:TextField(text, objectName, isReadOnly, stretch or 0, prefixTitle or "")
 end
 
 function GUIClass:LineField(text, objectName, isReadOnly, stretch, prefixTitle)
-    self._guiKit.LineField(text, objectName, isReadOnly, stretch or 0, prefixTitle or "")
+    self._guiKit:LineField(text, objectName, isReadOnly, stretch or 0, prefixTitle or "")
 end
 
 function GUIClass:SetLineFieldText(objectName, text)
-    self._guiKit.SetLineFieldText(objectName, text)
+    self._guiKit:SetLineFieldText(objectName, text)
 end
 
 function GUIClass:GetLineFieldText(objectName)
-    return self._guiKit.GetLineFieldText(objectName)
+    return self._guiKit:GetLineFieldText(objectName)
 end
 
 function GUIClass:ComboBox(menus, objectName, defaultIndex, stretch, prefixTitle)
     local itemChars = table.concat(menus, ";")
-    self._guiKit.ComboBox(itemChars, objectName, defaultIndex, stretch or 0, prefixTitle or "")
+    self._guiKit:ComboBox(itemChars, objectName, defaultIndex, stretch or 0, prefixTitle or "")
 end
 
 function GUIClass:SetComboBoxItems(objectName, items)
     local itemChars = table.concat(items, ";")
-    self._guiKit.SetComboBoxItems(objectName, itemChars)
+    self._guiKit:SetComboBoxItems(objectName, itemChars)
 end
 
 function GUIClass:OpenFileDialog(title, dir, filter)
-    return self._guiKit.OpenFileDialog(title, dir, filter)
+    return self._guiKit:OpenFileDialog(title, dir, filter)
 end
 
 function GUIClass:SetSizePolicy(objectName, horizontal, vertical)
-    self._guiKit.SetSizePolicy(objectName, horizontal, vertical)
+    self._guiKit:SetSizePolicy(objectName, horizontal, vertical)
 end
 
 function GUIClass:OpenDirDialog(title, dir)
-    return self._guiKit.OpenDirDialog(title, dir)
+    return self._guiKit:OpenDirDialog(title, dir)
 end
 
 function GUIClass:RadioGroup(items, title, objectName, defaultIndex, stretch, direction, prefixTitle)
     local itemChars = table.concat(items, ";")
-    return self._guiKit.RadioGroup(itemChars, title, objectName, defaultIndex, stretch, direction, prefixTitle)
+    return self._guiKit:RadioGroup(itemChars, title, objectName, defaultIndex, stretch, direction, prefixTitle)
 end

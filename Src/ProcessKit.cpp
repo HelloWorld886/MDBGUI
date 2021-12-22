@@ -6,13 +6,7 @@
 #include <QProcess>
 #include "Log.h"
 #include <QCoreApplication>
-
-LUA_EXPORT_CLASS_BEGIN(ProcessKit)
-LUA_EXPORT_METHOD(Start)
-LUA_EXPORT_METHOD(GetOutput)
-LUA_EXPORT_METHOD(GetError)
-LUA_EXPORT_METHOD(Stop)
-LUA_EXPORT_CLASS_END()
+#include <QElapsedTimer>
 
 ProcessKit::ProcessKit(QObject* parent) : QObject(parent)
 {
@@ -27,13 +21,13 @@ ProcessKit::~ProcessKit()
 }
 
 int ProcessKit::Start(const char* program,
-		const char* command,
-		const char* progress,
-		const char* finish,
-		long elapsed,
-		bool showLog)
+	const char* command,
+	const char* progress,
+	const char* finish,
+	long elapsed,
+	bool showLog)
 {
-	if(m_proc->state() != QProcess::NotRunning)
+	if (m_proc->state() != QProcess::NotRunning)
 		return HasProcRunning;
 
 	m_error.clear();
@@ -45,7 +39,12 @@ int ProcessKit::Start(const char* program,
 	m_proc->start();
 
 	if (!m_proc->waitForStarted())
+	{
+		auto error = QString::fromLocal8Bit(m_proc->readAllStandardError());
+		m_error.append(error);
 		return FailToStart;
+	}
+
 
 	while (m_proc->state() != QProcess::NotRunning)
 	{
@@ -78,7 +77,7 @@ int ProcessKit::Start(const char* program,
 	Log::LogD(finish);
 
 	m_proc->close();
-	if(m_proc->exitStatus() != QProcess::NormalExit)
+	if (m_proc->exitStatus() != QProcess::NormalExit)
 		return Crashed;
 	else
 		return m_proc->exitCode() == 0 ? Success : Unknown;
@@ -166,7 +165,7 @@ void ProcessKit::WaitSleep(long time)
 
 void ProcessKit::Stop()
 {
-	if(m_proc->state() == QProcess::NotRunning)
+	if (m_proc->state() == QProcess::NotRunning)
 		return;
 
 	m_proc->kill();

@@ -20,8 +20,8 @@ function IDBServiceClass:Install(uuid, ipaPath)
     self._taskName = "ideviceinstaller.exe"
 
     local cmd = string.format("-u %s -i %s", uuid, ipaPath)
-    if self._proc.Start("libimobiledevice/ideviceinstaller.exe", cmd, "安装中...", "安装完毕", 3000) ~= ExitCode.Success then
-        LogE("安装文件失败：".. self._proc.GetError())
+    if self._proc:Start("libimobiledevice/ideviceinstaller.exe", cmd, "安装中...", "安装完毕", 3000) ~= ExitCode.Success then
+        LogE("安装文件失败：".. self._proc:GetError())
         self._taskName = ""
         return false
     end
@@ -33,16 +33,16 @@ end
 function IDBServiceClass:Logcat(uuid, outputFilePath)
     self._taskName = "idevicesyslog.exe"
     local cmd =  string.format("-u %s -x >", uuid)
-    local result = self._proc.Start("libimobiledevice/idevicesyslog.exe", cmd, "抓取中...", "抓取完毕", self._defaultElapsed)
+    local result = self._proc:Start("libimobiledevice/idevicesyslog.exe", cmd, "抓取中...", "抓取完毕", self._defaultElapsed)
     self._taskName = ""
     if result == ExitCode.Success or result == ExitCode.Crashed then
         local file = io.open(outputFilePath, "w+")
-        file:write(self._proc.GetOutput())
+        file:write(self._proc:GetOutput())
         io.close(file)
         return true
     end
 
-    LogE("实时日志失败：".. self._proc.GetError())
+    LogE("实时日志失败：".. self._proc:GetError())
     return false
 end
 
@@ -59,7 +59,7 @@ function IDBServiceClass:Pull(uuid, bundleName, srcPath, dstPath)
 
     local exit = false
     local cmd = string.format("mnt -u %s --documents %s", uuid, bundleName)
-    local result = self._proc.Start("ifuse/ifuse.exe", cmd, "拷贝中...", "拷贝完毕", self._defaultElapsed)
+    local result = self._proc:Start("ifuse/ifuse.exe", cmd, "拷贝中...", "拷贝完毕", self._defaultElapsed)
     CoroutineService:StopCoroutine(coroutine)
     if result == ExitCode.Crashed or result == ExitCode.Success then
         Path.TryCopy("mnt/" .. srcPath, dstPath)
@@ -70,27 +70,27 @@ function IDBServiceClass:Pull(uuid, bundleName, srcPath, dstPath)
 
     Path.TryRemoveDir("mnt")
     if not exit then
-        LogE("拷贝文件失败: " .. self._proc.GetError())
+        LogE("拷贝文件失败: " .. self._proc:GetError())
     end
     return exit
 end
 
 function IDBServiceClass:StopProcess()
-    self._proc.Stop()
+    self._proc:Stop()
 end
 
 function IDBServiceClass:GetDevices()
     self._taskName = "idevice_id.exe"
 
-    if self._proc.Start("libimobiledevice/idevice_id.exe", "", "获取设备中...", "获取设备完毕", self._defaultElapsed) ~= ExitCode.Success then
+    if self._proc:Start("libimobiledevice/idevice_id.exe", "", "获取设备中...", "获取设备完毕", self._defaultElapsed) ~= ExitCode.Success then
         self._taskName = ""
-        LogE("获取设备失败：".. self._proc.GetError())
+        LogE("获取设备失败：".. self._proc:GetError())
         return {}
     end
 
     self._taskName = ""
 
-    local output = self._proc.GetOutput()
+    local output = self._proc:GetOutput()
     local splits = string.split(output, "\n")
     if not splits then
         return {}
@@ -110,8 +110,8 @@ function IDBServiceClass:GetDevices()
         local alias = ""
         local name = data[1]
         local status = data[2]
-        if self._proc.Start("libimobiledevice/idevice_id.exe", name, "获取设备名中", "获取设备名完毕", self._defaultElapsed) == ExitCode.Success then
-            alias = string.trim(self._proc.GetOutput(), "\n")
+        if self._proc:Start("libimobiledevice/idevice_id.exe", name, "获取设备名中", "获取设备名完毕", self._defaultElapsed) == ExitCode.Success then
+            alias = string.trim(self._proc:GetOutput(), "\n")
         end
         result[#result + 1] = {Name = name, Status = status, Alias = alias}
     end
@@ -120,9 +120,9 @@ function IDBServiceClass:GetDevices()
 end
 
 function IDBServiceClass:ReportCrash(uuid, dir)
-    local result = self._proc.Start("libimobiledevice/idevicecrashreport.exe", string.format("-u %s %s", uuid, dir), "获取日志中...", "获取日志完毕", 2000);
+    local result = self._proc:Start("libimobiledevice/idevicecrashreport.exe", string.format("-u %s %s", uuid, dir), "获取日志中...", "获取日志完毕", 2000);
     if result ~= ExitCode.Success then
-        LogE("获取崩溃日志失败：".. self._proc.GetError())
+        LogE("获取崩溃日志失败：".. self._proc:GetError())
         return false
     end
 
@@ -132,6 +132,6 @@ end
 function IDBServiceClass:KillProcess()
     if self._taskName and self._taskName ~= "" then
         self._proc:Stop()
-        self._proc.Start("cmd", string.format("/c taskkill /im %s /f", self._taskName), "结束进程中...",  "结束完毕", self._defaultElapsed)
+        self._proc:Start("cmd", string.format("/c taskkill /im %s /f", self._taskName), "结束进程中...",  "结束完毕", self._defaultElapsed)
     end
 end

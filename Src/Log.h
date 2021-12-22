@@ -8,7 +8,6 @@
 #include <QQueue>
 #include <QObject>
 #include <iostream>
-#include <luna/luna.h>
 
 enum LogLevel
 {
@@ -37,6 +36,12 @@ public:
 
 	static void LogE(const QString& message);
 
+	static void LogD(const char* message);
+
+	static void LogW(const char* message);
+
+	static void LogE(const char* message);
+
 	static Log* GetInstance();
 
 	static const int c_maxCount = 1000;
@@ -60,10 +65,6 @@ public:
 	inline void SetIsShowTime(bool isShowTime) { m_isShowTime = isShowTime; };
 
 	inline bool GetIsShowTime() { return m_isShowTime; };
-
-	int static LogDLuaWrapper(lua_State* state);
-	int static LogWLuaWrapper(lua_State* state);
-	int static LogELuaWrapper(lua_State* state);
 signals:
 
 	void DebugChanged(const QString& debug);

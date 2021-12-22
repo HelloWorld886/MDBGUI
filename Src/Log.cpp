@@ -33,6 +33,21 @@ void Log::LogE(const QString& message)
 	GetInstance()->PushError(message);
 }
 
+void Log::LogD(const char* message)
+{
+	GetInstance()->PushDebug(message);
+}
+
+void Log::LogW(const char* message)
+{
+	GetInstance()->PushWarning(message);
+}
+
+void Log::LogE(const char* message)
+{
+	GetInstance()->PushError(message);
+}
+
 Log::Log()
 {
 	m_dataList.clear();
@@ -168,39 +183,4 @@ QString Log::Format(LogLevel level, const QString& message, bool isShowTime) con
 	}
 
 	return QString("%1:%2").arg(prefix, message);
-}
-
-int Log::LogDLuaWrapper(lua_State* luaState)
-{
-	const char* message = lua_tostring(luaState, 1);
-
-	std::string error;
-	lua_call_global_function(luaState, &error, "print", std::tie(), message);
-
-	Log::GetInstance()->PushDebug(message);
-	return 0;
-}
-
-int Log::LogWLuaWrapper(lua_State* luaState)
-{
-	const char* message = lua_tostring(luaState, 1);
-
-	std::string error;
-	lua_call_global_function(luaState, &error, "print", std::tie(), message);
-
-	Log::GetInstance()->PushWarning(message);
-
-	return 0;
-}
-
-int Log::LogELuaWrapper(lua_State* luaState)
-{
-	const char* message = lua_tostring(luaState, 1);
-
-	std::string error;
-	lua_call_global_function(luaState, &error, "print", std::tie(), message);
-
-	Log::GetInstance()->PushError(message);
-
-	return 0;
 }

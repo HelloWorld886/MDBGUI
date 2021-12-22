@@ -4,11 +4,9 @@
 
 #pragma once
 
-#include <QThread>
-#include "luna/luna.h"
+#include <QObject>
 
 class QProcess;
-
 class ProcessKit final : public QObject
 {
 	Q_OBJECT
@@ -22,30 +20,23 @@ public:
 		HasProcRunning
 	};
 
-	explicit ProcessKit(QObject* parent = nullptr);
-
+	explicit ProcessKit(QObject *parent = nullptr);
 	~ProcessKit();
-
-	int Start(const char* program,
-			const char* command,
-			const char* progress,
-			const char* finish,
-			long elapsed = 100,
-			bool showLog = true);
-
+	int Start(const char *program,
+			  const char *command,
+			  const char *progress,
+			  const char *finish,
+			  long elapsed = 100,
+			  bool showLog = true);
 	void Stop();
-
 	std::string GetOutput() const;
-
 	std::string GetError() const;
 
-	DECLARE_LUA_CLASS(ProcessKit);
-
 private:
-	QStringList ParseCombinedArgString(const QString& p_args) const;
+	QStringList ParseCombinedArgString(const QString &p_args) const;
 	void WaitSleep(long time);
 
 	QString m_output;
 	QString m_error;
-	QProcess* m_proc;
+	QProcess *m_proc;
 };

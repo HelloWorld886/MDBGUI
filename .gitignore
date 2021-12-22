@@ -7,4 +7,5 @@ CMakeList.txt
 /cmake-build-debug-visual-studio-x64
 /cmake-build-debug-x64
 /cmake-build
-/CMakeLists.txt
+/.vs
+/out

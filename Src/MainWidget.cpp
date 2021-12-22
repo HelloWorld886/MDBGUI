@@ -10,13 +10,14 @@
 #include <QSplitter>
 #include "LogWidget.h"
 #include "Log.h"
-#include "luna/luna.h"
 #include "GUIKit.h"
 #include "ProcessKit.h"
 #include "lua.hpp"
 #include <QTimer>
 #include "PathKit.h"
 #include <QScrollArea>
+#include "LuaGenerator.h"
+#include "HelloLua.h"
 
 
 MainWidget::MainWidget(QWidget* parent) :
@@ -39,27 +40,9 @@ MainWidget::MainWidget(QWidget* parent) :
 
 	luaL_openlibs(m_luaState);
 
-	lua_newtable(m_luaState);
-	lua_pushstring(m_luaState, "GetFileName");
-	lua_pushcfunction(m_luaState, PathKit::GetFileNameLuaWrapper);
-	lua_settable(m_luaState, 1);
-	lua_pushstring(m_luaState, "TryRemoveDir");
-	lua_pushcfunction(m_luaState, PathKit::TryRemoveDirLuaWrapper);
-	lua_settable(m_luaState, 1);
-	lua_pushstring(m_luaState, "TryMakeDir");
-	lua_pushcfunction(m_luaState, PathKit::TryMakeDirLuaWrapper);
-	lua_settable(m_luaState, 1);
-	lua_pushstring(m_luaState, "TryCopy");
-	lua_pushcfunction(m_luaState, PathKit::TryCopyLuaWrapper);
-	lua_settable(m_luaState, 1);
-	lua_pushstring(m_luaState, "GetCurrentPath");
-	lua_pushcfunction(m_luaState, PathKit::GetCurrentPathLuaWrapper);
-	lua_settable(m_luaState, 1);
-	lua_setglobal(m_luaState, "Path");
-
-	lua_register(m_luaState, "LogD", Log::LogDLuaWrapper);
-	lua_register(m_luaState, "LogW", Log::LogWLuaWrapper);
-	lua_register(m_luaState, "LogE", Log::LogELuaWrapper);
+	REGISTER_CLASS(Log, m_luaState);
+	REGISTER_CLASS(GUIKit, m_luaState);
+	REGISTER_CLASS(ProcessKit, m_luaState);
 
 	int ret = luaL_dofile(m_luaState, "Plugins/Main.lua");
 	if (ret)
@@ -73,19 +56,13 @@ MainWidget::MainWidget(QWidget* parent) :
 
 	SetupUI();
 
-	lua_getglobal(m_luaState, "Main");
-	if (lua_gettop(m_luaState) != 0 && lua_isfunction(m_luaState, -1))
+	try
 	{
-		std::string error;
-		lua_call_function(m_luaState, &error, std::tie(), m_guiKit, m_procKit);
-		if (!error.empty())
-		{
-			Log::GetInstance()->PushError(error.c_str());
-		}
+		CallLuaGlobalFunctionParamNoRet(m_luaState, "Main", &m_guiKit, &m_procKit);
 	}
-	else
+	catch (LuaException& e)
 	{
-		Log::GetInstance()->PushError(tr("fail to call Main function"));
+		Log::GetInstance()->PushError(e.what());
 	}
 }
 
@@ -162,10 +139,14 @@ void MainWidget::OnButtonClicked(const char* objectName)
 	if (!m_luaState)
 		return;
 
-	std::string error;
-	lua_call_global_function(m_luaState, &error, "OnButtonClicked", std::tie(), objectName);
-	if(!error.empty())
-		Log::LogE(error.c_str());
+	try
+	{
+		CallLuaGlobalFunctionParamNoRet(m_luaState, "OnButtonClicked", objectName);
+	}
+	catch (LuaException& e)
+	{
+		Log::GetInstance()->PushError(e.what());
+	}
 }
 
 void MainWidget::OnTextFieldChanged(const char* objectName, const QString& text)
@@ -173,10 +154,14 @@ void MainWidget::OnTextFieldChanged(const char* objectName, const QString& text)
 	if (!m_luaState)
 		return;
 
-	std::string error;
-	lua_call_global_function(m_luaState, &error, "OnTextFieldChanged", std::tie(), objectName);
-	if(!error.empty())
-		Log::LogE(error.c_str());
+	try
+	{
+		CallLuaGlobalFunctionParamNoRet(m_luaState, "OnTextFieldChanged", objectName, (std::string)text.toLatin1().data());
+	}
+	catch (LuaException& e)
+	{
+		Log::GetInstance()->PushError(e.what());
+	}
 }
 
 void MainWidget::OnComboBoxChanged(const char* objectName, int index)
@@ -184,18 +169,26 @@ void MainWidget::OnComboBoxChanged(const char* objectName, int index)
 	if (!m_luaState)
 		return;
 
-	std::string error;
-	lua_call_global_function(m_luaState, &error, "OnComboBoxChanged", std::tie(), objectName, index);
-	if(!error.empty())
-		Log::LogE(error.c_str());
+	try
+	{
+		CallLuaGlobalFunctionParamNoRet(m_luaState, "OnComboBoxChanged", objectName, index);
+	}
+	catch (LuaException& e)
+	{
+		Log::GetInstance()->PushError(e.what());
+	}
 }
 
 void MainWidget::OnTick()
 {
-	std::string error;
-	lua_call_global_function(m_luaState, &error, "OnTick", std::tie(), 1);
-	if(!error.empty())
-		Log::LogE(error.c_str());
+	try
+	{
+		CallLuaGlobalFunctionParamNoRet(m_luaState, "OnTick", 1);
+	}
+	catch (LuaException& e)
+	{
+		Log::GetInstance()->PushError(e.what());
+	}
 }
 
 void MainWidget::OnDestroyed(QObject* obj)
@@ -203,10 +196,14 @@ void MainWidget::OnDestroyed(QObject* obj)
 	if(obj != this)
 		return;
 
-	std::string error;
-	lua_call_global_function(m_luaState, &error, "OnDestroyed", std::tie(), 1);
-	if(!error.empty())
-		Log::LogE(error.c_str());
+	try
+	{
+		CallLuaGlobalFunctionParamNoRet(m_luaState, "OnDestroyed", 1);
+	}
+	catch (LuaException& e)
+	{
+		Log::GetInstance()->PushError(e.what());
+	}
 }
 
 void MainWidget::OnRadioGroupToggled(const char* objectName, int id, bool checked)
@@ -214,8 +211,12 @@ void MainWidget::OnRadioGroupToggled(const char* objectName, int id, bool checke
 	if (!m_luaState)
 		return;
 
-	std::string error;
-	lua_call_global_function(m_luaState, &error, "OnRadioGroupToggled", std::tie(), objectName, id, checked);
-	if(!error.empty())
-		Log::LogE(error.c_str());
+	try
+	{
+		CallLuaGlobalFunctionParamNoRet(m_luaState, "OnRadioGroupToggled", objectName, id, checked);
+	}
+	catch (LuaException& e)
+	{
+		Log::GetInstance()->PushError(e.what());
+	}
 }

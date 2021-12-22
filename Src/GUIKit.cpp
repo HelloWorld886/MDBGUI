@@ -16,27 +16,6 @@
 #include <QButtonGroup>
 #include <QGroupBox>
 
-LUA_EXPORT_CLASS_BEGIN(GUIKit)
-LUA_EXPORT_METHOD(BeginTabWidget)
-LUA_EXPORT_METHOD(EndTabWidget)
-LUA_EXPORT_METHOD(BeginTab)
-LUA_EXPORT_METHOD(EndTab)
-LUA_EXPORT_METHOD(BeginLayout)
-LUA_EXPORT_METHOD(EndLayout)
-LUA_EXPORT_METHOD(Button)
-LUA_EXPORT_METHOD(Label)
-LUA_EXPORT_METHOD(TextField)
-LUA_EXPORT_METHOD(LineField)
-LUA_EXPORT_METHOD(SetLineFieldText)
-LUA_EXPORT_METHOD(GetLineFieldText)
-LUA_EXPORT_METHOD(ComboBox)
-LUA_EXPORT_METHOD(SetComboBoxItems)
-LUA_EXPORT_METHOD(OpenFileDialog)
-LUA_EXPORT_METHOD(SetSizePolicy)
-LUA_EXPORT_METHOD(OpenDirDialog)
-LUA_EXPORT_METHOD(RadioGroup)
-LUA_EXPORT_CLASS_END()
-
 GUIKit::GUIKit(QWidget* rootWidget, LayoutType layoutType) :
 	QObject(rootWidget),
 	m_rootWidget(rootWidget)
@@ -78,34 +57,34 @@ QLayout* GUIKit::CreateLayout(int layoutType)
 }
 
 void GUIKit::AddComponent(QWidget* component,
-		int stretch,
-		const char* prefixTitle)
+	int stretch,
+	const char* prefixTitle)
 {
 	QLayout* top = GetTopLayout();
 	Q_ASSERT(top);
 
-	if(typeid(*top) == typeid(QFormLayout))
+	if (typeid(*top) == typeid(QFormLayout))
 	{
 		QFormLayout* formLayout = dynamic_cast<QFormLayout*>(top);
 		Q_ASSERT(formLayout);
-		if(prefixTitle)
+		if (prefixTitle)
 			formLayout->addRow(prefixTitle, component);
 		else
 			formLayout->addRow(component);
 	}
-	else if(typeid(*top) == typeid(QVBoxLayout))
+	else if (typeid(*top) == typeid(QVBoxLayout))
 	{
 		QVBoxLayout* vboxLayout = dynamic_cast<QVBoxLayout*>(top);
 		Q_ASSERT(vboxLayout);
 		vboxLayout->addWidget(component, stretch);
 	}
-	else if(typeid(*top) == typeid(QHBoxLayout))
+	else if (typeid(*top) == typeid(QHBoxLayout))
 	{
 		QHBoxLayout* hboxLayout = dynamic_cast<QHBoxLayout*>(top);
 		Q_ASSERT(hboxLayout);
 		hboxLayout->addWidget(component, stretch);
 	}
-	else if(typeid(*top) == typeid(QGridLayout))
+	else if (typeid(*top) == typeid(QGridLayout))
 	{
 		QGridLayout* gridLayout = dynamic_cast<QGridLayout*>(top);
 		Q_ASSERT(gridLayout);
@@ -114,7 +93,7 @@ void GUIKit::AddComponent(QWidget* component,
 }
 
 void GUIKit::BeginTabWidget(const char* objectName,
-		const char* prefixTitle)
+	const char* prefixTitle)
 {
 	QWidget* top = GetTopWidget();
 	Q_ASSERT(top);
@@ -135,8 +114,8 @@ void GUIKit::EndTabWidget()
 }
 
 void GUIKit::BeginTab(const char* title,
-		int layoutType,
-		const char* objectName)
+	int layoutType,
+	const char* objectName)
 {
 	QWidget* top = m_widgetStack.top();
 	Q_ASSERT(top);
@@ -168,8 +147,8 @@ void GUIKit::EndTab()
 }
 
 void GUIKit::BeginLayout(int layoutType,
-		int stretch,
-		const char* prefixTitle)
+	int stretch,
+	const char* prefixTitle)
 {
 	QLayout* top = GetTopLayout();
 	Q_ASSERT(top);
@@ -177,29 +156,29 @@ void GUIKit::BeginLayout(int layoutType,
 	QLayout* layout = CreateLayout(layoutType);
 	Q_ASSERT(layout);
 
-	if(typeid(*top) == typeid(QFormLayout))
+	if (typeid(*top) == typeid(QFormLayout))
 	{
 		QFormLayout* formLayout = dynamic_cast<QFormLayout*>(top);
 		Q_ASSERT(formLayout);
 
-		if(prefixTitle)
+		if (prefixTitle)
 			formLayout->addRow(prefixTitle, layout);
 		else
 			formLayout->addRow(layout);
 	}
-	else if(typeid(*top) == typeid(QVBoxLayout))
+	else if (typeid(*top) == typeid(QVBoxLayout))
 	{
 		QVBoxLayout* vboxLayout = dynamic_cast<QVBoxLayout*>(top);
 		Q_ASSERT(vboxLayout);
 		vboxLayout->addLayout(layout, stretch);
 	}
-	else if(typeid(*top) == typeid(QHBoxLayout))
+	else if (typeid(*top) == typeid(QHBoxLayout))
 	{
 		QHBoxLayout* hboxLayout = dynamic_cast<QHBoxLayout*>(top);
 		Q_ASSERT(hboxLayout);
 		hboxLayout->addLayout(layout, stretch);
 	}
-	else if(typeid(*top) == typeid(QGridLayout))
+	else if (typeid(*top) == typeid(QGridLayout))
 	{
 		QGridLayout* gridLayout = dynamic_cast<QGridLayout*>(top);
 		Q_ASSERT(gridLayout);
@@ -217,23 +196,23 @@ void GUIKit::EndLayout()
 }
 
 void GUIKit::Button(const char* text,
-		const char* objectName,
-		int stretch,
-		const char* prefixTitle)
+	const char* objectName,
+	int stretch,
+	const char* prefixTitle)
 {
 	QPushButton* button = new QPushButton(text, GetTopWidget());
 	button->setObjectName(objectName);
-	connect(button, &QPushButton::clicked, this, [this, objectName]{
+	connect(button, &QPushButton::clicked, this, [this, objectName] {
 		emit ButtonClicked(objectName);
-	});
+		});
 
 	AddComponent(button, stretch, prefixTitle);
 }
 
 void GUIKit::Label(const char* text,
-		const char* objectName,
-		int stretch,
-		const char* prefixTitle)
+	const char* objectName,
+	int stretch,
+	const char* prefixTitle)
 {
 	QLabel* label = new QLabel(text, GetTopWidget());
 	label->setObjectName(objectName);
@@ -242,27 +221,27 @@ void GUIKit::Label(const char* text,
 }
 
 void GUIKit::TextField(const char* text,
-		const char* objectName,
-		bool readOnly,
-		int stretch,
-		const char* prefixTitle)
+	const char* objectName,
+	bool readOnly,
+	int stretch,
+	const char* prefixTitle)
 {
 	QTextEdit* edit = new QTextEdit(GetTopWidget());
 	edit->setText(text);
 	edit->setObjectName(objectName);
 	edit->setReadOnly(readOnly);
-	connect(edit, &QTextEdit::textChanged, this, [this, objectName, edit]{
+	connect(edit, &QTextEdit::textChanged, this, [this, objectName, edit] {
 		emit TextFieldChanged(objectName, edit->toPlainText());
-	});
+		});
 
 	AddComponent(edit, stretch, prefixTitle);
 }
 
 void GUIKit::LineField(const char* text,
-		const char* objectName,
-		bool readOnly,
-		int stretch,
-		const char* prefixTitle)
+	const char* objectName,
+	bool readOnly,
+	int stretch,
+	const char* prefixTitle)
 {
 	QLineEdit* edit = new QLineEdit(GetTopWidget());
 	edit->setText(text);
@@ -273,7 +252,7 @@ void GUIKit::LineField(const char* text,
 }
 
 void GUIKit::SetLineFieldText(const char* objectName,
-		const char* text)
+	const char* text)
 {
 	QLineEdit* edit = m_rootWidget->findChild<QLineEdit*>(objectName);
 	Q_ASSERT(edit);
@@ -288,10 +267,10 @@ std::string GUIKit::GetLineFieldText(const char* objectName)
 }
 
 void GUIKit::ComboBox(const char* menus,
-		const char* objectName,
-		int defaultIndex,
-		int stretch,
-		const char* prefixTitle)
+	const char* objectName,
+	int defaultIndex,
+	int stretch,
+	const char* prefixTitle)
 {
 	QComboBox* comboBox = new QComboBox(GetTopWidget());
 	comboBox->setObjectName(objectName);
@@ -300,15 +279,15 @@ void GUIKit::ComboBox(const char* menus,
 	comboBox->addItems(list);
 	comboBox->setCurrentIndex(defaultIndex);
 
-	connect(comboBox, &QComboBox::currentIndexChanged, this, [this, objectName](int index){
+	connect(comboBox, &QComboBox::currentIndexChanged, this, [this, objectName](int index) {
 		emit ComboBoxChanged(objectName, index);
-	});
+		});
 
 	AddComponent(comboBox, stretch, prefixTitle);
 }
 
 void GUIKit::SetComboBoxItems(const char* objectName,
-		const char* items)
+	const char* items)
 {
 	QComboBox* comboBox = m_rootWidget->findChild<QComboBox*>(objectName);
 	Q_ASSERT(comboBox);
@@ -318,9 +297,9 @@ void GUIKit::SetComboBoxItems(const char* objectName,
 	}
 	QString itemChars(items);
 	QStringList itemList = itemChars.split(";");
-	for(auto item : itemList)
+	for (auto item : itemList)
 	{
-		if(item.isEmpty())
+		if (item.isEmpty())
 		{
 			break;
 		}
@@ -330,16 +309,16 @@ void GUIKit::SetComboBoxItems(const char* objectName,
 }
 
 std::string GUIKit::OpenFileDialog(
-		const char* title,
-		const char* dir,
-		const char* filter)
+	const char* title,
+	const char* dir,
+	const char* filter)
 {
 	QString fileName = QFileDialog::getOpenFileName(
-			m_rootWidget,
-			title,
-			dir,
-			filter,
-			nullptr);
+		m_rootWidget,
+		title,
+		dir,
+		filter,
+		nullptr);
 
 	std::string result = fileName.toLatin1().data();
 
@@ -347,8 +326,8 @@ std::string GUIKit::OpenFileDialog(
 }
 
 void GUIKit::SetSizePolicy(const char* objectName,
-		int horizontal,
-		int vertical)
+	int horizontal,
+	int vertical)
 {
 	QWidget* widget = m_rootWidget->findChild<QWidget*>(objectName, Qt::FindChildrenRecursively);
 	Q_ASSERT(widget);
@@ -360,12 +339,12 @@ void GUIKit::SetSizePolicy(const char* objectName,
 }
 
 std::string GUIKit::OpenDirDialog(const char* title,
-		const char* dir)
+	const char* dir)
 {
 	QString fileName = QFileDialog::getExistingDirectory(
-			m_rootWidget,
-			title,
-			dir);
+		m_rootWidget,
+		title,
+		dir);
 
 	std::string result = fileName.toLatin1().data();
 
@@ -373,12 +352,12 @@ std::string GUIKit::OpenDirDialog(const char* title,
 }
 
 void GUIKit::RadioGroup(const char* items,
-		const char* title,
-		const char* objectName,
-		int defaultIndex,
-		int stretch,
-		int direction,
-		const char* prefixTitle)
+	const char* title,
+	const char* objectName,
+	int defaultIndex,
+	int stretch,
+	int direction,
+	const char* prefixTitle)
 {
 	QGroupBox* box = new QGroupBox(GetTopWidget());
 	box->setTitle(title);
@@ -387,7 +366,7 @@ void GUIKit::RadioGroup(const char* items,
 	buttonGroup->setObjectName(objectName);
 
 	QLayout* internalLayout;
-	if(direction == 0)
+	if (direction == 0)
 		internalLayout = new QHBoxLayout;
 	else
 		internalLayout = new QVBoxLayout;
@@ -396,7 +375,7 @@ void GUIKit::RadioGroup(const char* items,
 	QStringList list = itemChars.split(';');
 	for (int i = 0; i < list.length(); ++i)
 	{
-		if(list[i].isEmpty())
+		if (list[i].isEmpty())
 			continue;
 
 		QRadioButton* radioButton = new QRadioButton(box);
@@ -409,9 +388,9 @@ void GUIKit::RadioGroup(const char* items,
 
 	box->setLayout(internalLayout);
 
-	connect(buttonGroup, &QButtonGroup::idToggled, this, [this, objectName](int id, bool check){
+	connect(buttonGroup, &QButtonGroup::idToggled, this, [this, objectName](int id, bool check) {
 		emit RadioGroupToggled(objectName, id, check);
-	});
+		});
 
 	AddComponent(box, stretch, prefixTitle);
 }

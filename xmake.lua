@@ -3,11 +3,11 @@ add_rules("mode.debug", "mode.release")
 
 add_repositories("musmus-repo https://gitee.com/musmus9405/xmake-repo.git")
 add_requires("lua v5.4.3", {configs = {shared = false}})
-add_requires("luna")
+add_requires("hellolua main", {configs = {test = false, lua = "v5.4.3"}})
 
 target("MDBGUI")
     add_packages("lua")
-    add_packages("luna")
+    add_packages("hellolua")
     add_rules("qt.widgetapp")
     add_files("Src/*.cpp")
     add_files("Styles/Style.qrc")
@@ -31,8 +31,9 @@ target("MDBGUI")
         "$(env ADB_HOME)/AdbWinApi.dll",
         "$(env ADB_HOME)/AdbWinUsbApi.dll"
     )
+
     if is_plat("windows") and is_mode("debug") then
-        add_ldflags("/subsystem:console", "/entry:mainCRTStartup", {force = true})
+        add_ldflags("/SUBSYSTEM:CONSOLE", {force = true})
     end
 
     after_build(function(target)

@@ -2,7 +2,6 @@
 
 #include <QStack>
 #include <QObject>
-#include "luna/luna.h"
 #include <QLayoutItem>
 
 class QWidget;
@@ -15,7 +14,7 @@ class QRadioButton;
 
 class GUIKit final : public QObject
 {
-Q_OBJECT
+	Q_OBJECT
 public:
 	enum LayoutType
 	{
@@ -30,86 +29,85 @@ public:
 	~GUIKit();
 
 	void BeginTabWidget(const char* objectName,
-			const char* prefixTitle = nullptr);
+		const char* prefixTitle = nullptr);
 
 	void EndTabWidget();
 
 	void BeginTab(const char* title,
-			int layoutType,
-			const char* objectName);
+		int layoutType,
+		const char* objectName);
 
 	void EndTab();
 
 	void BeginLayout(int layoutType,
-			int stretch = 0,
-			const char* prefixTitle = nullptr);
+		int stretch = 0,
+		const char* prefixTitle = nullptr);
 
 	void EndLayout();
 
 	void Button(const char* text,
-			const char* objectName,
-			int stretch = 0,
-			const char* prefixTitle = nullptr);
+		const char* objectName,
+		int stretch = 0,
+		const char* prefixTitle = nullptr);
 
 	void Label(const char* text,
-			const char* objectName,
-			int stretch = 0,
-			const char* prefixTitle = nullptr);
+		const char* objectName,
+		int stretch = 0,
+		const char* prefixTitle = nullptr);
 
 	void TextField(const char* text,
-			const char* objectName,
-			bool isReadOnly,
-			int stretch = 0,
-			const char* prefixTitle = nullptr);
+		const char* objectName,
+		bool isReadOnly,
+		int stretch = 0,
+		const char* prefixTitle = nullptr);
 
 	void LineField(const char* text,
-			const char* objectName,
-			bool isReadOnly,
-			int stretch = 0,
-			const char* prefixTitle = nullptr);
+		const char* objectName,
+		bool isReadOnly,
+		int stretch = 0,
+		const char* prefixTitle = nullptr);
 
 	void SetLineFieldText(const char* objectName,
-			const char* text);
+		const char* text);
 
 	std::string GetLineFieldText(const char* objectName);
 
 	void ComboBox(const char* menus,
-			const char* objectName,
-			int defaultIndex,
-			int stretch = 0,
-			const char* prefixTitle = nullptr);
+		const char* objectName,
+		int defaultIndex,
+		int stretch = 0,
+		const char* prefixTitle = nullptr);
 
 	void SetComboBoxItems(const char* objectName,
-			const char* items);
+		const char* items);
 
 	std::string OpenFileDialog(const char* title,
-			const char* dir,
-			const char* filter);
+		const char* dir,
+		const char* filter);
 
 	std::string OpenDirDialog(const char* title,
-			const char* dir);
+		const char* dir);
 
 	void RadioGroup(const char* items,
-			const char* title,
-			const char* objectName,
-			int defaultIndex,
-			int stretch = 0,
-			int direction = 0,
-			const char* prefixTitle = nullptr);
+		const char* title,
+		const char* objectName,
+		int defaultIndex,
+		int stretch = 0,
+		int direction = 0,
+		const char* prefixTitle = nullptr);
 
 	void SetSizePolicy(const char* objectName,
-			int horizontal,
-			int vertical);
+		int horizontal,
+		int vertical);
 
-	DECLARE_LUA_CLASS(GUIKit);
 signals:
 	void ButtonClicked(const char* objectName);
 	void TextFieldChanged(const char* objectName,
-			const QString& text);
+		const QString& text);
 	void ComboBoxChanged(const char* objectName,
-			int index);
+		int index);
 	void RadioGroupToggled(const char* object,
-			int id, bool check);
+		int id, bool check);
 private:
 	QWidget* m_rootWidget;
 	QLayout* m_rootLayout;
@@ -119,8 +117,8 @@ private:
 	QLayout* CreateLayout(int layoutType);
 
 	void AddComponent(QWidget* component,
-			int stretch,
-			const char* prefixTitle);
+		int stretch,
+		const char* prefixTitle);
 
 	QWidget* GetTopWidget()
 	{
