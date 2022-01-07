@@ -33,6 +33,8 @@ public slots:
 
 	void OnTextFieldChanged(const char* objectName, const QString& text);
 
+	void OnLineFieldChanged(const char* objectName, const QString& text);
+
 	void OnComboBoxChanged(const char* objectName, int index);
 
 	void OnRadioGroupToggled(const char* objectName, int id, bool checked);

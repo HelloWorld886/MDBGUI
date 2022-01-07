@@ -108,6 +108,8 @@ signals:
 		int index);
 	void RadioGroupToggled(const char* object,
 		int id, bool check);
+	void LineFieldChanged(const char* objectName,
+		const QString& text);
 private:
 	QWidget* m_rootWidget;
 	QLayout* m_rootLayout;

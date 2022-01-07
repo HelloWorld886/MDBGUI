@@ -17,9 +17,9 @@ require("Plugins.HeaderGUI.HeaderGUI")
 require("Plugins.ToolGUI.ToolGUI")
 require("Plugins.ToolGUI.TabGUI.TabGUI")
 require("Plugins.ToolGUI.TabGUI.InstallTabGUI")
-require("Plugins.ToolGUI.TabGUI.GameLogTabGUI")
+require("Plugins.ToolGUI.TabGUI.ExportTabGUI")
 require("Plugins.ToolGUI.TabGUI.LogcatTabGUI")
-require("Plugins.ToolGUI.TabGUI.ReplaceFileTabGUI")
+require("Plugins.ToolGUI.TabGUI.ImportTabGUI")
 require("Plugins.ToolGUI.TabGUI.ReportCrashTabGUI")
 
 LogD = Log.LogD
@@ -59,6 +59,14 @@ function OnTextFieldChanged(objectName, text)
     end
 
     toolGUI:OnTextFieldChanged(objectName, text)
+end
+
+function OnLineFieldChanged(objectName, text)
+    if headerGUI:OnLineFieldChanged(objectName, text) then
+        return
+    end
+
+    toolGUI:OnLineFieldChanged(objectName, text)
 end
 
 function OnComboBoxChanged(objectName, index)

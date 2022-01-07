@@ -247,6 +247,9 @@ void GUIKit::LineField(const char* text,
 	edit->setText(text);
 	edit->setObjectName(objectName);
 	edit->setReadOnly(readOnly);
+	connect(edit, &QLineEdit::textChanged, this, [this, objectName, edit] {
+		emit LineFieldChanged(objectName, edit->text());
+		});
 
 	AddComponent(edit, stretch, prefixTitle);
 }

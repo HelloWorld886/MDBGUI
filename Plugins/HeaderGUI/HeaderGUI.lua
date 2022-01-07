@@ -9,15 +9,15 @@ local HeaderGUIClass = DeclareClass("HeaderGUIClass", ClassLib.GUIClass)
 
 function HeaderGUIClass:ctor()
     HeaderGUIClass.__super.AddSerialField(self, "RemoteAddress", "Header.RemoteAddress", false)
+    HeaderGUIClass.__super.AddSerialField(self, "PackageName", "Header.PackageName", false)
 end
 
 function HeaderGUIClass:Initialize(guiKit)
     HeaderGUIClass.__super.Initialize(self, guiKit)
 
     self:BeginLayout(LayoutType.Form)
-    self:BeginLayout(LayoutType.HBox, 1, "地区:")
-    DataService.RegionIndex = 1
-    self:ComboBox(DataService:GetRegionTable(), "region_cbb", DataService.RegionIndex - 1)
+    self:BeginLayout(LayoutType.HBox, 1, "包名:")
+    self:LineField(self:GetSerialField("PackageName"), "package_lf", false, 1)
     self:EndLayout()
 
     MDBService:SetPlatform(Platform.Android)
@@ -72,7 +72,6 @@ function HeaderGUIClass:OnButtonClicked(objectName)
         return true
     elseif objectName == "device_remote_connect_btn" then
         local address = self:GetLineFieldText("device_remote_lf")
-        self:SetSerialField("RemoteAddress", address)
         if MDBService:Connect(address) then
             self:RefreshDevices()
         end
@@ -85,15 +84,18 @@ function HeaderGUIClass:OnButtonClicked(objectName)
     end
 end
 
-function HeaderGUIClass:OnTextFieldChanged(objectName, text)
+function HeaderGUIClass:OnLineFieldChanged(objectName, text)
+    if objectName == "package_lf" then
+        DataService.PackageName = text
+        self:SetSerialField("PackageName", text)
+    elseif objectName == "device_remote_lf" then
+        self:SetSerialField("RemoteAddress", text)
+    end
 end
 
 function HeaderGUIClass:OnComboBoxChanged(objectName, index)
     if objectName == "device_cbb" then
         DataService:SetDeviceIndex(index + 1)
-        return true
-    elseif objectName == "region_cbb" then
-        DataService.RegionIndex = index + 1
         return true
     end
 end

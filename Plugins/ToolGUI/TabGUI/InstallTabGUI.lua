@@ -74,6 +74,11 @@ function InstallTabGUIClass:vOnComboBoxChanged(objectName, index)
 end
 
 function InstallTabGUIClass:Install()
+    if DataService.PackageName == "" then
+        LogE("包名不能为空")
+        return
+    end
+
     local deviceName = DataService:GetDeviceName()
 
     local apkPath = self:GetSerialField("ApkPath")

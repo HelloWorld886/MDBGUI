@@ -7,27 +7,9 @@
 local DataServiceClass = DeclareClass("DataServiceClass")
 
 function DataServiceClass:ctor()
-    self._region = {
-        {RegionName = "中国大陆", PackageName = "com.tencent.tmgp.sskgame"},
-        {RegionName = "港澳台", PackageName = "com.tencent.tmgp.ssktw"},
-        {RegionName = "东南亚", PackageName = "com.tencent.tmgp.ssksea"},
-        {RegionName = "欧美", PackageName = "com.tencent.tmgp.sskeus"},
-        {RegionName = "韩国", PackageName = "com.tencent.tmgp.sskkr"},
-        {RegionName = "日本", PackageName = "com.tencent.tmgp.sskjp"}
-    }
-
+    self.PackageName = ""
     self.DeviceData = false
     self.DeviceDataList = false
-    self.RegionIndex = 0
-end
-
-function DataServiceClass:GetRegionTable()
-    local regions = {}
-    for i = 1, #self._region do
-        regions[i] = string.format("%s(%s)", self._region[i].RegionName, self._region[i].PackageName)
-    end
-
-    return regions;
 end
 
 function DataServiceClass:SetDeviceIndex(index)
@@ -46,24 +28,12 @@ function DataServiceClass:GetDeviceName()
     return self.DeviceData.Name
 end
 
-function DataServiceClass:GetPackageName()
-    return self._region[self.RegionIndex].PackageName
-end
-
 function DataServiceClass:GetObbPath()
-    return string.format("/sdcard/Android/obb/%s/", self:GetPackageName())
+    return string.format("/sdcard/Android/obb/%s/", self.PackageName)
 end
 
-function DataServiceClass:GetGameLogPath()
-    if MDBService:GetPlatform() == Platform.Android then
-        return string.format("/sdcard/Android/data/%s/files/Log", self:GetPackageName())
-    else
-        return "Log/"
-    end
-end
-
-function DataServiceClass:GetPkgBasePath()
-    return string.format("/sdcard/Android/data/%s/files/Resources/PkgBase/", self:GetPackageName())
+function DataServiceClass:GetDataPath()
+    return string.format("/sdcard/Android/data/%s/", self.PackageName)
 end
 
 DataService = DataServiceClass.new()

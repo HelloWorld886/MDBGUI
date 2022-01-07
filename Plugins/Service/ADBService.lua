@@ -44,6 +44,7 @@ function ADBServiceClass:StartServer()
 end
 
 function ADBServiceClass:Push(deviceName, srcPath, dstPath)
+    LogD(string.format("-s %s push %s %s", deviceName, srcPath, dstPath))
     if self._proc:Start("adb.exe", string.format("-s %s push %s %s", deviceName, srcPath, dstPath),  "拷贝中...", "拷贝完毕", 2000) ~= ExitCode.Success then
         LogE("拷贝电脑文件失败：".. self._proc:GetError())
         return false
@@ -53,6 +54,7 @@ function ADBServiceClass:Push(deviceName, srcPath, dstPath)
 end
 
 function ADBServiceClass:Pull(deviceName, srcPath, dstPath)
+    LogD(string.format("-s %s pull %s %s", deviceName, srcPath, dstPath))
     if self._proc:Start("adb.exe", string.format("-s %s pull %s %s", deviceName, srcPath, dstPath), "拷贝中...", "拷贝完毕", self._defaultElapsed) ~= ExitCode.Success then
         LogE("拷贝设备文件失败：" .. self._proc:GetError())
         return false
@@ -62,6 +64,7 @@ function ADBServiceClass:Pull(deviceName, srcPath, dstPath)
 end
 
 function ADBServiceClass:Install(deviceName, apkPath)
+    LogD(string.format("-s %s install %s", deviceName, apkPath))
     if self._proc:Start("adb.exe", string.format("-s %s install %s", deviceName, apkPath), "安装中...", "安装完毕", 3000) ~= ExitCode.Success then
         LogE("安装文件失败：".. self._proc:GetError())
         return false
@@ -71,6 +74,7 @@ function ADBServiceClass:Install(deviceName, apkPath)
 end
 
 function ADBServiceClass:Logcat(deviceName, priority, format, outputFilePath)
+    LogD(string.format("-s %s logcat -%s %s", deviceName, priority, format))
     local result = self._proc:Start("adb.exe", string.format("-s %s logcat -%s %s", deviceName, priority, format), "抓取中...", "抓取完毕", self._defaultElapsed,false)
     if result == ExitCode.Success or result == ExitCode.Crashed then
         local output = self._proc:GetOutput()
@@ -85,6 +89,7 @@ function ADBServiceClass:Logcat(deviceName, priority, format, outputFilePath)
 end
 
 function ADBServiceClass:Connect(address)
+    LogD(string.format("connect %s", address))
     if self._proc:Start("adb.exe", string.format("connect %s", address), "连接中...", "连接完毕", self._defaultElapsed) ~= ExitCode.Success then
         LogE("连接远程设备失败：".. self._proc:GetError())
         return false
@@ -94,7 +99,7 @@ function ADBServiceClass:Connect(address)
 end
 
 function ADBServiceClass:Disconnect(address)
-    LogD("adb disconnect")
+    string.format("disconnect %s", address)
     if self._proc:Start("adb.exe", string.format("disconnect %s", address), "断开连接中...", "断开完毕", self._defaultElapsed) ~= ExitCode.Success then
         LogE("断开远程设备失败：".. self._proc:GetError())
         return false

@@ -40,6 +40,10 @@ function TabGUIClass:vOnTextFieldChanged(objectName, text)
 
 end
 
+function TabGUIClass:vOnLineFieldChanged(objectName, text)
+
+end
+
 function TabGUIClass:vOnComboBoxChanged(objectName, index)
 
 end

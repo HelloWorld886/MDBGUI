@@ -120,6 +120,7 @@ QLayout* MainWidget::SetupFunctionUI(QWidget* parent)
 	connect(m_guiKit, &GUIKit::TextFieldChanged, this, &MainWidget::OnTextFieldChanged);
 	connect(m_guiKit, &GUIKit::ComboBoxChanged, this, &MainWidget::OnComboBoxChanged);
 	connect(m_guiKit, &GUIKit::RadioGroupToggled, this, &MainWidget::OnRadioGroupToggled);
+	connect(m_guiKit, &GUIKit::LineFieldChanged, this, &MainWidget::OnLineFieldChanged);
 
 	return functionLayout;
 }
@@ -163,6 +164,22 @@ void MainWidget::OnTextFieldChanged(const char* objectName, const QString& text)
 		Log::GetInstance()->PushError(e.what());
 	}
 }
+
+void MainWidget::OnLineFieldChanged(const char* objectName, const QString& text)
+{
+	if (!m_luaState)
+		return;
+
+	try
+	{
+		CallLuaGlobalFunctionParamNoRet(m_luaState, "OnLineFieldChanged", objectName, (std::string)text.toLatin1().data());
+	}
+	catch (LuaException& e)
+	{
+		Log::GetInstance()->PushError(e.what());
+	}
+}
+
 
 void MainWidget::OnComboBoxChanged(const char* objectName, int index)
 {

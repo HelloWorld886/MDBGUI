@@ -11,9 +11,9 @@ local ToolGUIClass = DeclareClass("ToolGUIClass", ClassLib.GUIClass)
 function ToolGUIClass:ctor()
     self._tabList = {
         ClassLib.InstallTabGUIClass.new(),
-        ClassLib.GameLogTabGUIClass.new(),
+        ClassLib.ExportTabGUIClass.new(),
         ClassLib.LogcatTabGUIClass.new(),
-        ClassLib.ReplaceFileTabGUIClass.new(),
+        ClassLib.ImportTabGUIClass.new(),
         ClassLib.ReportCrashTabGUIClass.new()
     }
 end
@@ -51,6 +51,14 @@ end
 function ToolGUIClass:OnTextFieldChanged(objectName, text)
     for i = 1, #self._tabList do
         if self._tabList[i]:vOnTextFieldChanged(objectName, text) then
+            break
+        end
+    end
+end
+
+function ToolGUIClass:OnLineFieldChanged(objectName, text)
+    for i = 1, #self._tabList do
+        if self._tabList[i]:vOnLineFieldChanged(objectName, text) then
             break
         end
     end
