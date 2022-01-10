@@ -1,9 +1,9 @@
-set_config("version", "0.0.4")
+set_config("version", "0.0.5")
 add_rules("mode.debug", "mode.release")
 
 add_repositories("musmus-repo https://gitee.com/musmus9405/xmake-repo.git")
-add_requires("lua v5.4.3", {configs = {shared = false}})
-add_requires("hellolua main", {configs = {test = false, lua = "v5.4.3"}})
+add_requires("lua v5.4.3", {configs = {shared = true}})
+add_requires("hellolua main", {configs = {test = false, lua = "v5.4.3", shared = true}})
 
 target("MDBGUI")
     add_packages("lua")
