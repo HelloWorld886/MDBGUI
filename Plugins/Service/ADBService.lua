@@ -44,6 +44,21 @@ function ADBServiceClass:StartServer()
 end
 
 function ADBServiceClass:Push(deviceName, srcPath, dstPath)
+    dstPath = string.gsub(dstPath, "\\", "/")
+    local splits = string.split(dstPath, "/")
+    if #splits > 0 then
+        local lastName = nil
+        for i = #splits, 1, -1 do
+            if splits[i] ~= "" then
+                lastName = splits[i]
+                break
+            end
+            -- body
+        end
+        if lastName and not string.find(lastName, "%.") then
+            dstPath = dstPath .. "/"
+        end
+    end
     LogD(string.format("-s %s push %s %s", deviceName, srcPath, dstPath))
     if self._proc:Start("adb.exe", string.format("-s %s push %s %s", deviceName, srcPath, dstPath),  "拷贝中...", "拷贝完毕", 2000) ~= ExitCode.Success then
         LogE("拷贝电脑文件失败：".. self._proc:GetError())
