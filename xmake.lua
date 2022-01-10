@@ -65,7 +65,7 @@ target("MDBGUI")
         import("core.base.semver")
 
         local buildir = "$(buildir)/$(plat)/$(arch)/$(mode)"
-        local packagedir = "$(buildir)/packages/MDBGUI_" .. "$(plat)_$(arch)_$(mode)_v$(version)"
+        local packagedir = "$(buildir)/packages/MDBGUI_" .. "$(plat)_$(arch)_$(mode)_v$(version)/"
         if os.isdir(packagedir) then
             os.rm(packagedir)
         end
@@ -73,12 +73,12 @@ target("MDBGUI")
 
         local files = target:values("runtime_files")
         for _, file in ipairs(files) do
-            os.cp(file, packagedir)
+            os.trycp(file, packagedir)
         end
 
         local folders = target:values("runtime_folders")
         for _, folder in ipairs(folders) do
-            os.cp(folder, packagedir)
+            os.trycp(folder, packagedir)
         end
 
         local qt = target:data("qt")
@@ -91,10 +91,18 @@ target("MDBGUI")
             local file_suffix = ".dll"
             framework = "Qt" .. qt_sdkver:major() .. framework:sub(3) .. (is_mode("debug") and debug_suffix or "") .. file_suffix
 
-            os.cp(
+            os.trycp(
                 path.join(qt.bindir, framework),
                 path.join(packagedir, framework)
             )
+        end
+
+        for _, pkg in ipairs(target:orderpkgs()) do
+            for _, libfile in ipairs(pkg:get("libfiles")) do
+                if string.endswith(libfile, ".dll") then
+                    os.trycp(libfile,packagedir)
+                end
+            end
         end
 
         copy_plugins(
