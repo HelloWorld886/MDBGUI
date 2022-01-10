@@ -51,6 +51,7 @@ MainWidget::MainWidget(QWidget* parent) :
 		Log::GetInstance()->PushError(error);
 		lua_close(m_luaState);
 		m_luaState = nullptr;
+		SetupUI();
 		return;
 	}
 
@@ -198,6 +199,9 @@ void MainWidget::OnComboBoxChanged(const char* objectName, int index)
 
 void MainWidget::OnTick()
 {
+	if (!m_luaState)
+		return;
+
 	try
 	{
 		CallLuaGlobalFunctionParamNoRet(m_luaState, "OnTick", 1);
@@ -210,7 +214,7 @@ void MainWidget::OnTick()
 
 void MainWidget::OnDestroyed(QObject* obj)
 {
-	if(obj != this)
+	if(obj != this || !m_luaState)
 		return;
 
 	try
