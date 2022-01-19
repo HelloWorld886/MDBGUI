@@ -95,7 +95,7 @@ function InstallTabGUIClass:GetFileName(path)
     path = string.gsub(path, "\\", "/")
     local splits = string.split(path, "/")
     local lastName = ""
-    if #splits > 0 then
+    if splits and #splits > 0 then
         for i = #splits, 1, -1 do
             if splits[i] ~= "" then
                 lastName = splits[i]
