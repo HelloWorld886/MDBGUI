@@ -1,4 +1,4 @@
-set_config("version", "0.0.5")
+set_config("version", "0.0.6")
 add_rules("mode.debug", "mode.release")
 
 add_repositories("musmus-repo https://gitee.com/musmus9405/xmake-repo.git")

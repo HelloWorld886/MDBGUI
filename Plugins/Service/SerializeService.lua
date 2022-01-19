@@ -66,6 +66,7 @@ function SerializeServiceClass:WriteValue(str, value, save)
             end
 
             if i == #split then
+                result[split[i]] = value or ""
                 break
             else
                 result = result[split[i]]

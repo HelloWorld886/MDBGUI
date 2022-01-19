@@ -85,8 +85,24 @@ function InstallTabGUIClass:Install()
     MDBService:Install(deviceName, apkPath)
 
     local mainObbPath = self:GetSerialField("MainObbPath")
-    MDBService:Push(deviceName, mainObbPath, DataService:GetObbPath() .. Path.GetFileName(mainObbPath))
+    MDBService:Push(deviceName, mainObbPath, DataService:GetObbPath() .. self:GetFileName(mainObbPath))
 
     local patchObbPath = self:GetSerialField("PatchObbPath")
-    MDBService:Push(deviceName, patchObbPath, DataService:GetObbPath() .. Path.GetFileName(patchObbPath))
+    MDBService:Push(deviceName, patchObbPath, DataService:GetObbPath() .. self:GetFileName(patchObbPath))
+end
+
+function InstallTabGUIClass:GetFileName(path)
+    path = string.gsub(path, "\\", "/")
+    local splits = string.split(path, "/")
+    local lastName = ""
+    if #splits > 0 then
+        for i = #splits, 1, -1 do
+            if splits[i] ~= "" then
+                lastName = splits[i]
+                break
+            end
+        end
+    end
+
+    return lastName
 end
