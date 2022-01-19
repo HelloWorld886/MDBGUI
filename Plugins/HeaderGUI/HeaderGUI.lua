@@ -17,6 +17,7 @@ function HeaderGUIClass:Initialize(guiKit)
 
     self:BeginLayout(LayoutType.Form)
     self:BeginLayout(LayoutType.HBox, 1, "包名:")
+    DataService.PackageName = self:GetSerialField("PackageName")
     self:LineField(self:GetSerialField("PackageName"), "package_lf", false, 1)
     self:EndLayout()
 
